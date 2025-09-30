@@ -1,5 +1,5 @@
 from ctypes import cast, POINTER, byref, c_char_p, c_ubyte, create_string_buffer, sizeof, Structure
-from ctypes.wintypes import LONG, WORD, DWORD, LPVOID, BYTE #, SHORT, BOOL, HBITMAP, HDC, UINT, HANDLE
+from ctypes.wintypes import LONG, WORD, DWORD, LPVOID, BYTE
 import io
 from math import sqrt
 from PIL import Image, ImageDraw, ImageFont, ImagePalette
@@ -82,9 +82,6 @@ def get_bpp(img):
 #
 ########################################
 def image_to_hbitmap(img):
-
-#    print('image_to_hbitmap', img.mode, MODE_TO_BPP[img.mode])
-
     f = io.BytesIO()
 
     if img.mode in ('LA', 'PA'):
@@ -129,8 +126,7 @@ def hbitmap_to_image(h_bitmap):
     bmi.bmiHeader.biPlanes = bm.bmPlanes
     bmi.bmiHeader.biBitCount = bm.bmBitsPixel
     bmi.bmiHeader.biCompression = BI_RGB
-    bmi.bmiHeader.biSizeImage = bm.bmWidth * bm.bmHeight * 4
-#    bmi.bmiHeader.biSizeImage = ((((bm.bmWidth * bmi.bmiHeader.biBitCount) + 31) & ~31) >> 3) * bm.bmHeight
+    bmi.bmiHeader.biSizeImage = ((((bm.bmWidth * bmi.bmiHeader.biBitCount) + 31) & ~31) >> 3) * bm.bmHeight
     bits = create_string_buffer(bmi.bmiHeader.biSizeImage)
     gdi32.GetDIBits(hdc, h_bitmap, 0, bm.bmHeight, bits, byref(bmi), DIB_RGB_COLORS)
     gdi32.DeleteDC(hdc)

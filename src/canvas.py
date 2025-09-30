@@ -82,7 +82,7 @@ class Canvas(Window):
 
         super().__init__(
             window_class=newclass.lpszClassName,
-            style=WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_VSCROLL | WS_HSCROLL,  # | WS_BORDER
+            style=WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_VSCROLL | WS_HSCROLL,
             ex_style=WS_EX_COMPOSITED,
             parent_window=parent_window,
             top=top
@@ -292,6 +292,8 @@ class Canvas(Window):
     #
     ########################################
     def load_hbitmap(self, hbitmap, zoom_to_fit=False, force_update=False, zoom=None):
+        if self.static.h_bitmap:
+            gdi32.DeleteObject(self.static.h_bitmap)
 
         self.static.load_hbitmap(hbitmap)
         self.initialized = True
@@ -320,9 +322,9 @@ class Canvas(Window):
             self.initialized = True
             return self.load_hbitmap(hbitmap, zoom_to_fit=zoom_to_fit)
 
-#        self.static.load_hbitmap(hbitmap)
         gdi32.DeleteObject(self.static.h_bitmap)
         self.static.h_bitmap = hbitmap
+
         user32.InvalidateRect(self.static.hwnd, None, TRUE)
 
     ########################################

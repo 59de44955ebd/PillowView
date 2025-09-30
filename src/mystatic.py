@@ -33,7 +33,6 @@ class MyStatic(Window):
             parent_window=parent_window,
             window_class=newclass.lpszClassName,
             style=WS_CHILD,
-#            ex_style=WS_EX_TRANSPARENT,
         )
 
         ########################################
@@ -51,18 +50,6 @@ class MyStatic(Window):
 
             gdi32.SetStretchBltMode(hdc, HALFTONE)
 
-#            MERGECOPY
-#            Merges the colors of the source rectangle with the brush currently selected in hdcDest, by using the Boolean AND operator.
-
-#            MERGEPAINT
-#	         Merges the colors of the inverted source rectangle with the colors of the destination rectangle by using the Boolean OR operator.
-
-#            SRCAND
-#	        Combines the colors of the source and destination rectangles by using the Boolean AND operator.
-
-#            SRCPAINT
-#	        Combines the colors of the source and destination rectangles by using the Boolean OR operator.
-
             gdi32.StretchBlt(
                 # dest
                 hdc, 0, 0, rc.right, rc.bottom,
@@ -73,20 +60,10 @@ class MyStatic(Window):
 
             gdi32.DeleteDC(hdc_mem)
 
-#            user32.FrameRect(hdc, byref(rc), gdi32.GetStockObject(WHITE_BRUSH if self.is_dark else BLACK_BRUSH))
-
             user32.EndPaint(hwnd, byref(ps))
             return FALSE
 
         self.register_message_callback(WM_PAINT, _on_WM_PAINT)
-
-        ########################################
-        #
-        ########################################
-#        def _on_WM_ERASEBKGND(hwnd, wparam, lparam):
-#            return 1
-
-#        self.register_message_callback(WM_ERASEBKGND, _on_WM_ERASEBKGND)
 
     ########################################
     #
@@ -97,7 +74,6 @@ class MyStatic(Window):
         bm = BITMAP()
         gdi32.GetObjectW(self.h_bitmap, sizeof(BITMAP), byref(bm))
         self.img_width, self.img_height = bm.bmWidth, bm.bmHeight
-#        user32.InvalidateRect(self.hwnd, None, TRUE)
 
     ########################################
     #
@@ -106,4 +82,4 @@ class MyStatic(Window):
         if self.h_bitmap:
             gdi32.DeleteObject(self.h_bitmap)
             self.h_bitmap = None
-#        user32.InvalidateRect(self.hwnd, None, TRUE)
+
