@@ -1,0 +1,1 @@
+Paint Toolbar for drawing shapes, lines, arrows and text

@@ -1,0 +1,1 @@
+Import frames from video files via FFmpeg (requires ffmpeg.exe)

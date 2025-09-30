@@ -1,0 +1,1 @@
+Scanning support based on TWAIN

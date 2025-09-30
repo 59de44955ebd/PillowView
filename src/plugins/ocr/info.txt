@@ -1,0 +1,1 @@
+Optical character regognition (OCR) based on tesseract (requires tesseract.exe)

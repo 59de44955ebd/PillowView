@@ -1,0 +1,1 @@
+SVG read support based on CairoSVG

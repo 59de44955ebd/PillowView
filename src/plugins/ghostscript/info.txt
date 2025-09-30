@@ -1,0 +1,1 @@
+Postscript (EPS/PS) read/write, Illustrator (AI) read and PDF read support based on Ghostscript

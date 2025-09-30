@@ -1,0 +1,18 @@
+_tests/
+*_test*
+docs/
+stuff/
+releases/
+build/
+dist/
+*.spec
+_backup.rar
+test_files/
+
+x64/
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
+# User-specific files
+*.user

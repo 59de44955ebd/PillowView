@@ -1,0 +1,1 @@
+Read-only support for file types PCT/PICT, MNG and 48/64/96/128-Bit PSD/TIFF

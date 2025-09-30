@@ -1,0 +1,1 @@
+CorelDraw and FreeHand read support based on headless LibreOffice Draw (requires LibreOffice)

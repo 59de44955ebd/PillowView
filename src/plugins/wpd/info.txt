@@ -1,0 +1,1 @@
+Take pictures with digital cameras connected via USB using the Windows Portable Device API
