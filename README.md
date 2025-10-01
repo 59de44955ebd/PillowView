@@ -39,8 +39,8 @@ PillowView in Windows 11 (dark mode)
 - MSP (read/write)
 - PCD (read)
 - PCX (read/write)
-- PDF (write - read support via ghostscript plugin)
-- PIL (read/write)
+- PDF (write - read support via ghostscript plugin, see below)
+- PIL (read/write, see below)
 - PIXAR (read)
 - PNG (read/write)
 - PPM (read/write)
@@ -119,3 +119,7 @@ SVG read support, based on [CairoSVG](https://cairosvg.org/).
 
 ### wpd
 Take and import a picture from a digital camera connected via USB using the [Windows Portable Devices (WPD)](https://learn.microsoft.com/en-us/windows/win32/windows-portable-devices) API. Only supports cameras that implement the WPD_FUNCTIONAL_CATEGORY_STILL_IMAGE_CAPTURE feature. Since recent Windows Explorer does a good job concerning browsing the storage of connected WPD devices, this plugin does not try to replicate this feature, it's only meant for taking pictures.
+
+## PIL image file format
+
+PillowView supports a custom file format called PIL (.pil) that allows to save and load images with any image mode that Pillow supports. There is also a [Thumbnail Handler Shell Extension](https://github.com/59de44955ebd/PIL-Thumbnail-Handler) for Windows that allows Windows Explorer to show thumbnails for PIL files (15 modes supported).

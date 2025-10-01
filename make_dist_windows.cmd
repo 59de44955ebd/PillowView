@@ -64,14 +64,15 @@ echo Optimizing dist folder...
 echo ****************************************
 
 del "dist\%APP_NAME%\_internal\api-ms-win-*.dll"
-::del "dist\%APP_NAME%\_internal\PIL\_imagingtk.cp312-win_amd64.pyd"
-::del "dist\%APP_NAME%\_internal\PIL\_imagingcms.cp312-win_amd64.pyd"
-::del "dist\%APP_NAME%\_internal\PIL\_avif.cp312-win_amd64.pyd"
+del "dist\%APP_NAME%\_internal\ucrtbase.dll"
+del "dist\%APP_NAME%\_internal\VCRUNTIME140.dll"
+
 del "dist\%APP_NAME%\_internal\libcrypto-3.dll
 del "dist\%APP_NAME%\_internal\libssl-3.dll
 del "dist\%APP_NAME%\_internal\_bz2.pyd
 del "dist\%APP_NAME%\_internal\_lzma.pyd"
-del "dist\%APP_NAME%\_internal\_ssl.pyd
+del "dist\%APP_NAME%\_internal\_ssl.pyd"
+
 
 ::echo.
 ::echo ****************************************
@@ -79,8 +80,8 @@ del "dist\%APP_NAME%\_internal\_ssl.pyd
 ::echo ****************************************
 ::
 ::cd dist
-::del "%APP_NAME%-standalone-windows-x64.zip" 2>nul
-::zip -q -r "%APP_NAME%-standalone-windows-x64.zip" "%APP_NAME%"
+::del "%APP_NAME%-x64-full.zip" 2>nul
+::zip -q -r "%APP_NAME%-x64-full.zip" "%APP_NAME%"
 ::cd ..
 
 echo.
