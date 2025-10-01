@@ -64,8 +64,8 @@ class App(MainWin):
             hicon = user32.LoadIconW(HMOD_RESOURCES, MAKEINTRESOURCEW(1)),
             hmenu = user32.LoadMenuW(HMOD_RESOURCES, MAKEINTRESOURCEW(1)),
             haccel = user32.LoadAcceleratorsW(HMOD_RESOURCES, MAKEINTRESOURCEW(1)),
-            hbrush = HBRUSH_NULL,
-            dark_bg_brush = HBRUSH_NULL,
+#            hbrush = HBRUSH_NULL,
+#            dark_bg_brush = HBRUSH_NULL,
         )
 
         self.COMMAND_MESSAGE_MAP = {
@@ -453,10 +453,10 @@ class App(MainWin):
             self.apply_theme(True)
             uxtheme.SetWindowTheme(self.canvas.hwnd, 'DarkMode_Explorer', None)
 
+        self.show()
+
         if len(args) > 0:
             self.load_file(args[0])
-
-        self.show()
 
         if self.state['show_toolbar']:
             user32.CheckMenuItem(self.hmenu, IDM_TOOLBAR, MF_BYCOMMAND | MF_CHECKED)
