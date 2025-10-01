@@ -2,19 +2,21 @@
 setlocal EnableDelayedExpansion
 cd /d %~dp0
 
-:: config
+REM Config
 set APP_NAME=PillowView
+set DIR=%CD%
+set APP_DIR=%CD%\dist\%APP_NAME%\
 
-:: cleanup
+REM Cleanup dist folder
 rmdir /s /q "dist\%APP_NAME%" 2>nul
-::del "dist\%APP_NAME%-standalone-windows-x64.zip" 2>nul
+del "dist\%APP_NAME%-x64-full.7z" 2>nul
+del "dist\%APP_NAME%-x64-no-plugins.7z" 2>nul
+del "dist\%APP_NAME%-x64-setup.exe" 2>nul
 
+REM "Compile" winapp contants
 cd src
 python _compile_const.py
 cd ..
-
-set PYTHONPATH=
-
 ren src\winapp\const.py __const.py
 ren src\winapp\const_c.py const.py
 
@@ -22,7 +24,7 @@ echo.
 echo ****************************************
 echo Running pyinstaller...
 echo ****************************************
-
+set PYTHONPATH=
 pyinstaller --noupx -w -n "%APP_NAME%" -i NONE -r src\resources.dll -D src\main.py ^
 --hidden-import winapp.controls.button ^
 --hidden-import winapp.controls.edit ^
@@ -73,16 +75,94 @@ del "dist\%APP_NAME%\_internal\_bz2.pyd
 del "dist\%APP_NAME%\_internal\_lzma.pyd"
 del "dist\%APP_NAME%\_internal\_ssl.pyd"
 
+call :create_7z
+call :create_installer
 
-::echo.
-::echo ****************************************
-::echo Creating ZIP...
-::echo ****************************************
-::
-::cd dist
-::del "%APP_NAME%-x64-full.zip" 2>nul
-::zip -q -r "%APP_NAME%-x64-full.zip" "%APP_NAME%"
-::cd ..
-
+:done
+echo.
+echo ****************************************
+echo Done.
+echo ****************************************
 echo.
 pause
+
+endlocal
+goto :eof
+
+
+:create_7z
+if not exist "C:\Program Files\7-Zip\" (
+	echo.
+	echo ****************************************
+	echo 7z.exe not found at default location, omitting .7z creation...
+	echo ****************************************
+	exit /B
+)
+echo.
+echo ****************************************
+echo Creating .7z archives...
+echo ****************************************
+cd dist
+set PATH=C:\Program Files\7-Zip;%PATH%
+
+7z a "%APP_NAME%-x64-full.7z" "%APP_NAME%\*"
+move /y "%APP_NAME%\_internal\plugins" .
+7z a "%APP_NAME%-x64-no-plugins.7z" "%APP_NAME%\*"
+move /y plugins "%APP_NAME%\_internal\"
+cd ..
+exit /B
+
+
+:create_installer
+if not exist "C:\Program Files (x86)\NSIS\" (
+	echo.
+	echo ****************************************
+	echo NSIS not found at default location, omitting installer creation...
+	echo ****************************************
+	exit /B
+)
+echo.
+echo ****************************************
+echo Creating installer...
+echo ****************************************
+
+REM Get length of APP_DIR
+set TF=%TMP%\x
+echo %APP_DIR%> %TF%
+for %%? in (%TF%) do set /a LEN=%%~z? - 2
+del %TF%
+
+call :make_abs_nsh nsis\uninstall_list.nsh
+
+del "%NSH%" 2>nul
+
+cd "%APP_DIR%"
+
+for /F %%f in ('dir /b /a-d') do (
+	echo Delete "$INSTDIR\%%f" >> "%NSH%"
+)
+
+for /F %%d in ('dir /s /b /aD') do (
+	cd "%%d"
+	set DIR_REL=%%d
+	for /F %%f IN ('dir /b /a-d 2^>nul') do (
+		echo Delete "$INSTDIR\!DIR_REL:~%LEN%!\%%f" >> "%NSH%"
+	)
+)
+
+cd "%APP_DIR%"
+
+for /F %%d in ('dir /s /b /ad^|sort /r') do (
+	set DIR_REL=%%d
+	echo RMDir "$INSTDIR\!DIR_REL:~%LEN%!" >> "%NSH%"
+)
+
+cd "%DIR%"
+set PATH=C:\Program Files (x86)\NSIS;%PATH%
+makensis nsis\make-installer.nsi
+exit /B
+
+
+:make_abs_nsh
+set NSH=%~dpnx1%
+exit /B

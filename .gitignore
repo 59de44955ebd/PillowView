@@ -16,3 +16,6 @@ x64/
 
 # User-specific files
 *.user
+
+# NSIS
+/nsis/uninstall_list.nsh
