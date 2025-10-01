@@ -64,9 +64,10 @@ PillowView in Windows 11 (dark mode)
 - EPS/PS
 - FH/FHx (Macromedia FreeHand)
 - MNG
-- ODG (LibreOffice/OpenOffice Draw)
+- ODG (OpenDocument Graphic)
 - PDF
 - PICT (Mac Pict)
+- PSD and TIFF with 16 and 32 bits (floating point) per channel.
 - SVG
 - Video file formats (many)
 
