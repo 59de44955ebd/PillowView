@@ -53,9 +53,9 @@ def _open(fp, filename, ** kwargs):
     # 12: bpp == 128 - 4x 32-bit floats per pixel (PSD and TIFF)
     ########################################
     if img_type == FREE_IMAGE_TYPE.FIT_RGBAF:
-        cnt = data_size // sizeof(FLOAT)
+        cnt = data_size // sizeof(c_float)
 
-        data_in = cast(bits, POINTER(FLOAT * cnt)).contents
+        data_in = cast(bits, POINTER(c_float * cnt)).contents
         data_out = (c_ubyte * cnt)()
 
         for i in range(cnt):
@@ -71,23 +71,9 @@ def _open(fp, filename, ** kwargs):
     ########################################
     elif img_type == FREE_IMAGE_TYPE.FIT_RGBF:
 
-#            dib_converted = fi.FreeImage_ToneMapping(dib, FREE_IMAGE_TMO.FITMO_DRAGO03, 2.2, -1.5)
-#            fi.FreeImage_Unload(dib)
-#            bits = fi.FreeImage_GetBits(dib_converted)
-#            pitch = fi.FreeImage_GetPitch(dib_converted)
-#            data = cast(bits, POINTER(c_ubyte * (pitch * h))).contents
-#
-#            img = Image.frombytes('RGB', (w, h), data, 'raw', 'BGR', 0, -1)
-#            fi.FreeImage_Unload(dib_converted)
-#            return img
+        cnt = data_size // sizeof(c_float)
 
-#    FITMO_DRAGO03	 = 0  # Adaptive logarithmic mapping (F. Drago, 2003)
-#    FITMO_REINHARD05 = 1  # Dynamic range reduction inspired by photoreceptor physiology (E. Reinhard, 2005)
-#    FITMO_FATTAL02	 = 2  # Gradient domain high dynamic range compression (R. Fattal, 2002)
-
-        cnt = data_size // sizeof(FLOAT)
-
-        data_in = cast(bits, POINTER(FLOAT * cnt)).contents
+        data_in = cast(bits, POINTER(c_float * cnt)).contents
         data_out = (c_ubyte * cnt)()
 
         for i in range(cnt):
@@ -144,7 +130,7 @@ def _open(fp, filename, ** kwargs):
             else:  # FIC_PALETTE
                 cu = fi.FreeImage_GetColorsUsed(dib)
                 img = Image.frombytes('P', (w, h), data, 'raw', 'P', 0, -1)
-                pal = cast(fi.FreeImage_GetPalette(dib), POINTER(BYTE * (4 * cu))).contents
+                pal = cast(fi.FreeImage_GetPalette(dib), POINTER(c_ubyte * (4 * cu))).contents
                 img.putpalette(ImagePalette.raw("BGRX", pal))
 
         elif bpp == 24:
