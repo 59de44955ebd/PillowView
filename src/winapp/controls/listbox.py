@@ -1,6 +1,6 @@
 # https://learn.microsoft.com/en-us/windows/win32/controls/list-boxes
 
-from ..const import *  #WS_VSCROLL, WS_BORDER, WS_CHILD, WS_VISIBLE
+from ..const import *
 from ..window import *
 
 
@@ -34,9 +34,6 @@ class ListBox(Window):
         # remove blue focus border
         def _on_WM_NCPAINT(hwnd, wparam, lparam):
             hdc = user32.GetDC(hwnd)
-            #hdc = user32.GetDCEx(hwnd, wparam, DCX_WINDOW | DCX_INTERSECTRGN)  # returns None
-#            rc = self.get_client_rect()
-#            user32.InflateRect(byref(rc), 1, 1)
             rc = self.get_window_rect()
             rc = RECT(-1, -1, rc.right - rc.left - 1, rc.bottom - rc.top - 1)
             user32.FrameRect(hdc, byref(rc), gdi32.CreateSolidBrush(BORDER_COLOR))
@@ -74,10 +71,7 @@ class ListBox(Window):
     def rename_item(self, idx, new_name):
         data = user32.SendMessageW(self.hwnd, LB_GETITEMDATA, idx, 0)
         user32.SendMessageW(self.hwnd, LB_DELETESTRING, idx, 0)
-
-        #user32.SendMessageW(self.hwnd, LB_INSERTSTRING, idx, new_name)
         idx = user32.SendMessageW(self.hwnd, LB_ADDSTRING, 0, new_name)
-
         user32.SendMessageW(self.hwnd, LB_SETITEMDATA, idx, data)
 
     ########################################
@@ -99,16 +93,6 @@ class ListBox(Window):
             self.parent_window.register_message_callback(WM_CTLCOLORLISTBOX, self.on_WM_CTLCOLORLISTBOX)
         else:
             self.parent_window.unregister_message_callback(WM_CTLCOLORLISTBOX, self.on_WM_CTLCOLORLISTBOX)
-
-    ########################################
-    #
-    ########################################
-#    def on_WM_CTLCOLORLISTBOX(self, hwnd, wparam, lparam):
-#        if lparam == self.hwnd:
-#            gdi32.SetTextColor(wparam, DARK_TEXT_COLOR)
-##            gdi32.SetBkColor(wparam, 0x2b2b2b)  #sDARK_CONTROL_BG_COLOR)
-#            gdi32.SetDCBrushColor(wparam, DARKER_CONTROL_BG_COLOR)
-#            return gdi32.GetStockObject(DC_BRUSH)
 
     # #######################################
     #

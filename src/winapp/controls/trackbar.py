@@ -9,12 +9,6 @@ from ..themes import *
 from ..dlls import user32
 from ..window import *
 
-#  typedef struct tagTRBTHUMBPOSCHANGING {
-#    NMHDR hdr;
-#    DWORD dwPos;
-#    int nReason;
-#  } NMTRBTHUMBPOSCHANGING;
-
 
 ########################################
 # Wrapper Class
@@ -87,7 +81,6 @@ class TrackBar(Window):
     def apply_theme(self, is_dark):
         super().apply_theme(is_dark)
 
-#        uxtheme.SetWindowTheme(self.hwnd, 'DarkMode_CFD' if is_dark else 'CFD', None)
         uxtheme.SetWindowTheme(self.hwnd, 'DarkMode_Explorer' if is_dark else 'Explorer', None)
 
         if is_dark:
@@ -116,10 +109,7 @@ class TrackBar(Window):
     ########################################
     def on_WM_HSCROLL(self, hwnd, wparam, lparam):
         if lparam == self.hwnd:
-#            print('>>>', HIWORD(wparam), SHORT(HIWORD(wparam)).value)
-
             lo, hi, = wparam & 0xFFFF, (wparam >> 16) & 0xFFFF
-#            print('>>>', SHORT(hi).value)
 
             if lo == TB_ENDTRACK:
                 # remove keyboardfocus from trackbar
@@ -162,17 +152,5 @@ class TrackBar(Window):
 
                 if nmcd.dwItemSpec == 3:
                     user32.FillRect(nmcd.hdc, byref(nmcd.rc), DARK_DISABLED_BRUSH)
-#                if nmcd.uItemState & CDIS_HOT or nmcd.uItemState & CDIS_CHECKED:
-#                    if nmcd.lItemlParam in self.__wholedropdown_button_ids:
-#                        _draw_arrow(nmcd.hdc, nmcd.rc.left + 22, nmcd.rc.top + 8)
-#                    else:
-#                        user32.FillRect(nmcd.hdc, byref(RECT(nmcd.rc.left + 21, nmcd.rc.top - 4, nmcd.rc.left + 22, nmcd.rc.bottom + 4)),
-#                                DARK_TOOLBAR_BUTTON_BORDER_BRUSH)
-#                        _draw_arrow(nmcd.hdc, nmcd.rc.left + 25, nmcd.rc.top + 4)
-#                else:
-#                    if nmcd.lItemlParam in self.__wholedropdown_button_ids:
-#                        _draw_arrow(nmcd.hdc, nmcd.rc.left + 23, nmcd.rc.top + 9)
-#                    else:
-#                        _draw_arrow(nmcd.hdc, nmcd.rc.left + 26, nmcd.rc.top + 5)
                     return CDRF_SKIPDEFAULT
                 return CDRF_DODEFAULT

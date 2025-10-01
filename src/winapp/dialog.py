@@ -6,26 +6,9 @@ from ctypes.wintypes import (SHORT, WORD, DWORD, HWND, HINSTANCE, LPWSTR, LPCWST
 from .wintypes_extended import WINFUNCTYPE, UINT_PTR, SUBCLASSPROC
 from .dlls import comdlg32, comctl32, gdi32
 from .const import *
-
 from .window import *
 from .themes import *
-
-#from .controls.button import *
-#from .controls.edit import *
-#from .controls.static import *
-
 from .controls.common import COMBOBOXINFO, LVCOLUMNW, TCITEMW
-#from .controls.combobox import COMBOBOXINFO
-#from .controls.listview import LVCOLUMNW
-#from .controls.tabcontrol import TCITEMW
-
-
-#DIALOG_CLASS = '#32770'
-
-#DIALOG_DEFAULT = 0
-#DIALOG_MSGBOX = 1           # MessageBox (used as default)
-#DIALOG_CUSTOM_PROC = 2      # Dialog with custom dialog proc
-#DIALOG_FILE = 3             # Open/Save file dialog
 
 CHECKBOX_SUBCLASS_ID = 0
 DIALOG_SUBCLASS_ID = 0
@@ -43,26 +26,11 @@ BUTTON_COMMAND_IDS = {
     MB_RETRYCANCEL: (IDRETRY, IDCANCEL)
 }
 
-#class SHSTOCKICONINFO(Structure):
-#    def __init__(self, *args, **kwargs):
-#        super(SHSTOCKICONINFO, self).__init__(*args, **kwargs)
-#        self.cbSize = sizeof(self)
-#    _fields_ = (
-#        ('cbSize', DWORD),
-#        ('hIcon', HANDLE),
-#        ('iSysImageIndex', INT),
-#        ('iIcon', INT),
-#        ('szPath', WCHAR * MAX_PATH),
-#    )
-
 LPHOOKPROC = WINFUNCTYPE(UINT_PTR, HWND, UINT, WPARAM, LPARAM)
 
 ########################################
 # Open/Save Filename
 ########################################
-
-#OFNHOOKPROC = WINFUNCTYPE(UINT_PTR, HWND, UINT, WPARAM, LPARAM)
-#LPOFNHOOKPROC = OFNHOOKPROC #POINTER(OFNHOOKPROC) #c_voidp # TODO
 
 class OPENFILENAMEW(Structure):
     _fields_ = (
@@ -108,7 +76,6 @@ class LOGFONTW(Structure):
 #    def __repr__(self):
 #        return "<LOGFONTW '%s' %d>" % (self.lfFaceName, self.lfHeight)
     _fields_ = [
-        # C:/PROGRA~1/MIAF9D~1/VC98/Include/wingdi.h 1090
         ('lfHeight', LONG),
         ('lfWidth', LONG),
         ('lfEscapement', LONG),
@@ -180,10 +147,6 @@ class PRINTDLGW(Structure):
 
 LPPRINTDLGW = POINTER(PRINTDLGW)
 
-#PD_ALLPAGES = 0
-#PD_RETURNDC = 0x00000100
-#PD_RETURNDEFAULT = 0x00000400
-
 comdlg32.PrintDlgW.argtypes = (LPPRINTDLGW,)
 
 class DOCINFOW(Structure):
@@ -239,8 +202,6 @@ comdlg32.PageSetupDlgW.argtypes = (LPPAGESETUPDLGW,)
 # ChooseColor
 ########################################
 
-#LPCCHOOKPROC = WINFUNCTYPE(UINT_PTR, HWND, UINT, WPARAM, LPARAM)
-
 class CHOOSECOLORW(Structure):
     def __init__(self, *args, **kwargs):
         super(CHOOSECOLORW, self).__init__(*args, **kwargs)
@@ -253,7 +214,7 @@ class CHOOSECOLORW(Structure):
         ("lpCustColors",                POINTER(COLORREF)),
         ("Flags",                       DWORD),
         ("lCustData",                   LPARAM),
-        ("lpfnHook",                    LPHOOKPROC),  # LPCCHOOKPROC
+        ("lpfnHook",                    LPHOOKPROC),
         ("lpTemplateName",              LPCWSTR),
 #        ("lpEditInfo",                  LPVOID),  # LPEDITMENU
     ]
@@ -266,12 +227,9 @@ CC_SOLIDCOLOR = 0x80
 CC_FULLOPEN = 0x02
 CC_RGBINIT = 0x01
 
-
 ########################################
 # Find/Replace
 ########################################
-
-#LPFRHOOKPROC = WINFUNCTYPE(UINT_PTR, HWND, UINT, WPARAM, LPARAM)
 
 class FINDREPLACEW(Structure):
     def __init__(self, *args, **kwargs):
@@ -287,7 +245,7 @@ class FINDREPLACEW(Structure):
         ('wFindWhatLen',                WORD),
         ('wReplaceWithLen',             WORD),
         ('lCustData',                   LPARAM),
-        ('lpfnHook',                    LPHOOKPROC), # LPFRHOOKPROC
+        ('lpfnHook',                    LPHOOKPROC),
         ('lpTemplateName',              LPCWSTR),
     ]
 
@@ -297,59 +255,9 @@ comdlg32.FindTextW.restype = HWND
 comdlg32.ReplaceTextW.argtypes = (POINTER(FINDREPLACEW),)
 comdlg32.ReplaceTextW.restype = HWND
 
-# modern icon (flat)
-#def get_stock_icon(siid):
-#    sii = SHSTOCKICONINFO()
-#    SHGSI_ICON = 0x000000100
-#    shell32.SHGetStockIconInfo(siid, SHGSI_ICON, byref(sii))
-#    return sii.hIcon
-
-#def dialog_calculate_text_rect(text, font_name='MS Shell Dlg', font_size=8, hfont=None):
-#    hdc = user32.GetDC(0)
-#    if hfont is None:
-#        hfont = gdi32.CreateFontW(font_size, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_TT_PRECIS,
-#                CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, font_name)
-#    gdi32.SelectObject(hdc, hfont)
-#    #gdi32.SetMapMode(hdc, MM_TWIPS)
-#    rc = RECT(0, 0, 0, 0)
-#    user32.DrawTextW(hdc, text, -1, byref(rc), DT_CALCRECT | DT_LEFT | DT_NOPREFIX)
-#    user32.ReleaseDC(0, hdc)
-#    return rc
-
-## logical coordinates, not pixels
-#def dialog_calculate_multiline_text_height(text, text_width, font_name='MS Shell Dlg', font_size=8, hfont=None):
-#    hdc = user32.GetDC(0)
-#    if hfont is None:
-#        hfont = gdi32.CreateFontW(font_size, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_TT_PRECIS,
-#                CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, font_name)
-#    gdi32.SelectObject(hdc, hfont)
-#    rc = RECT(0, 0, text_width, 0)
-#    user32.DrawTextW(hdc, text, -1, byref(rc), DT_CALCRECT | DT_LEFT | DT_TOP | DT_WORDBREAK | DT_NOPREFIX)
-#    user32.ReleaseDC(0, hdc)
-#    return rc.bottom
-
-#def dialog_center(hwnd, hwnd_parent):
-#    rc_dlg = RECT()
-#    user32.GetWindowRect(hwnd, byref(rc_dlg))
-#    rc_parent = RECT()
-#    user32.GetWindowRect(hwnd_parent, byref(rc_parent))
-#
-#    if (rc_parent.right - rc_parent.left) - (rc_dlg.right - rc_dlg.left) > 20:
-#        x = rc_parent.left + (((rc_parent.right - rc_parent.left) - (rc_dlg.right - rc_dlg.left)) // 2)
-#    else:
-#        x = rcParent.left + 70
-#    if (rc_parent.bottom - rc_parent.top) - (rc_dlg.bottom - rc_dlg.top) > 20:
-#        y = rc_parent.top + (((rc_parent.bottom - rc_parent.top) - (rc_dlg.bottom - rc_dlg.top)) // 2)
-#    else:
-#        y = rc_parent.top + 60
-#    user32.SetWindowPos(hwnd, 0, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE)
-
-
-
 class ExternalDialog():
     def __init__(self, hwnd):
         self.hwnd = hwnd
-
 
 ########################################
 #
@@ -386,7 +294,7 @@ def DarkOnCtlColorBtn(hdc):
 ########################################
 def DarkOnCtlColorEdit(hdc):
     gdi32.SetTextColor(hdc, DARK_TEXT_COLOR)
-    gdi32.SetBkColor(hdc, DARK_BG_COLOR)  # DARK_CONTROL_BG_COLOR
+    gdi32.SetBkColor(hdc, DARK_BG_COLOR)
     gdi32.SetDCBrushColor(hdc, DARK_BG_COLOR)
     return gdi32.GetStockObject(DC_BRUSH)
 
@@ -397,7 +305,6 @@ def _DarkCheckBoxSubClassProcCallback(hwnd, msg, wparam, lparam, uidsubclass, dw
     if msg == WM_CTLCOLORSTATIC:
         return DarkOnCtlColorStatic(wparam)
     return comctl32.DefSubclassProc(hwnd, msg, wparam, lparam)
-#    return user32.DefWindowProcW(hwnd, msg, wparam, lparam)
 
 DarkCheckBoxSubclassProc = SUBCLASSPROC(_DarkCheckBoxSubClassProcCallback)
 
@@ -434,7 +341,7 @@ def _DarkGroupBoxSubClassProcCallback(hwnd, msg, wparam, lparam, uidsubclass, dw
 
             gdi32.SetTextColor(hdc, DARK_TEXT_COLOR)
             rcText = RECT(rcClient.left + 9, rcClient.top, rcClient.right, rcClient.bottom)
-            user32.DrawTextW(hdc, winText, -1, byref(rcText), DT_SINGLELINE | DT_LEFT)  # | DT_VCENTER)
+            user32.DrawTextW(hdc, winText, -1, byref(rcText), DT_SINGLELINE | DT_LEFT)  # | DT_VCENTER
 
     if msg == WM_PRINTCLIENT:
         hdc = cast(wparam, HDC)
@@ -507,11 +414,6 @@ def _DarkListViewSubClassProcCallback(hwnd, msg, wparam, lparam, uidsubclass, dw
 
 DarkListViewSubClassProc = SUBCLASSPROC(_DarkListViewSubClassProcCallback)
 
-
-#TAB_SELECTED_DARK_BG_BRUSH = gdi32.CreateSolidBrush(0x333333)
-#TAB_BORDER_BRUSH_DARK = TAB_SELECTED_DARK_BG_BRUSH
-#TAB_SELECTED_HILITE_BRUSH = gdi32.CreateSolidBrush(0xD77800)  # 0xFF9933
-
 ########################################
 #
 ########################################
@@ -522,8 +424,6 @@ def _DarkTabControlSubClassProcCallback(hwnd, msg, wparam, lparam, uidsubclass, 
         hdc = user32.BeginPaint(hwnd, byref(ps))
         gdi32.SetBkMode(hdc, TRANSPARENT)
         gdi32.SetTextColor(hdc, DARK_TEXT_COLOR)
-
-#        gdi32.SelectObject(hdc, self.hfont)
         gdi32.SelectObject(hdc, user32.SendMessageW(hwnd, WM_GETFONT, 0, 0))
 
         # tabbar background
@@ -557,19 +457,10 @@ def _DarkTabControlSubClassProcCallback(hwnd, msg, wparam, lparam, uidsubclass, 
             user32.SendMessageW(hwnd, TCM_GETITEMW, idx, byref(tc_item))
             user32.DrawTextW(hdc, buf.value, -1, RECT(rc.left, rc.top + 1, rc.right, rc.bottom), DT_SINGLELINE | DT_CENTER | DT_VCENTER)
 
-            # tab close button
-#            if self.__close_button_imagelist:
-##                if idx == self.__close_button_hover_index:
-##                    user32.FillRect(hdc, byref(RECT(rc.right - 13, rc.top + 3, rc.right - 1, rc.top + 15)), DARK_MENU_BG_BRUSH_HOT)
-#                comctl32.ImageList_Draw(self.__close_button_imagelist, 1 if self.is_dark else 0, hdc, rc.right - 15 + 5, 3 + 5, ILD_NORMAL)
-#                if idx == self.__close_button_hover_index:
-#                    user32.InvertRect(hdc, byref(RECT(rc.right - 13, rc.top + 3, rc.right - 1, rc.top + 15)))
-
         user32.EndPaint(hwnd, byref(ps))
         return FALSE
 
     return comctl32.DefSubclassProc(hwnd, msg, wparam, lparam)
-#    return user32.DefWindowProcW(hwnd, msg, wparam, lparam)
 
 DarkTabControlSubClassProc = SUBCLASSPROC(_DarkTabControlSubClassProcCallback)
 
@@ -578,27 +469,16 @@ DarkTabControlSubClassProc = SUBCLASSPROC(_DarkTabControlSubClassProcCallback)
 ########################################
 def _DialogSubClassProcCallback(hwnd, msg, wparam, lparam, uidsubclass, dwrefdata):
 
-#    if msg == WM_ERASEBKGND:
-#        rc = RECT()
-#        user32.GetClientRect(hwnd, byref(rc))
-#        user32.FillRect(wparam, byref(rc), DARK_CONTROL_BG_BRUSH)
-#        return TRUE
-
-
     if msg == WM_CTLCOLORDLG:
-        #if self.is_dark:
         return DarkOnCtlColorDlg(wparam)
 
     elif msg == WM_CTLCOLORSTATIC:
-        #if self.is_dark:
         return DarkOnCtlColorStatic(wparam)
 
     elif msg == WM_CTLCOLORBTN:
-        #if self.is_dark:
         return DarkOnCtlColorBtn(wparam)
 
     elif msg == WM_CTLCOLOREDIT or msg == WM_CTLCOLORLISTBOX:
-        #if self.is_dark:
         return DarkOnCtlColorEdit(wparam)
 
     return comctl32.DefSubclassProc(hwnd, msg, wparam, lparam)
@@ -616,23 +496,16 @@ def _MsgBoxSubClassProcCallback(hwnd, msg, wparam, lparam, uidsubclass, dwrefdat
         user32.FillRect(wparam, byref(rc), DARK_CONTROL_BG_BRUSH)
         return TRUE
 
-#        MSGBOX_HANDLE_CONTROL_MESSAGES()
-
     elif msg == WM_CTLCOLORDLG:
-        #if self.is_dark:
         return DarkOnCtlColorDlg(wparam)
 
     elif msg == WM_CTLCOLORSTATIC:
-        #if self.is_dark:
         return DarkOnCtlColorStaticMsgBox(wparam)
 
     elif msg == WM_CTLCOLORBTN:
-        #if self.is_dark:
         return DarkOnCtlColorBtn(wparam)
 
     elif msg == WM_CTLCOLOREDIT or msg == WM_CTLCOLORLISTBOX:
-        #if self.is_dark:
-        #return self.DarkOnCtlColorBtn(wparam)
         gdi32.SetTextColor(wparam, DARK_TEXT_COLOR)
         gdi32.SetBkColor(wparam, DARK_CONTROL_BG_COLOR)
         gdi32.SetDCBrushColor(wparam, DARK_CONTROL_BG_COLOR)
@@ -667,10 +540,8 @@ def _DarkComboBoxClassProcCallback(hwnd, msg, wparam, lparam, uidsubclass, dwref
         if not (user32.GetWindowLongA(lparam, GWL_STYLE) & LBS_OWNERDRAWFIXED):
 #            return DarkOnCtlColorListBox((HDC)wparam)
             pass
+
         else:
-
-#            s_hwndListBox = (HWND)lparam;
-
             gdi32.SetBkColor(wparam, 0)
             gdi32.SetDCBrushColor(wparam, 0)
             return gdi32.GetStockObject(DC_BRUSH)
@@ -682,7 +553,6 @@ def _DarkComboBoxClassProcCallback(hwnd, msg, wparam, lparam, uidsubclass, dwref
         return gdi32.GetStockObject(DC_BRUSH)
 
     elif msg == WM_DRAWITEM:
-#        DRAWITEMSTRUCT *di = (DRAWITEMSTRUCT*)lparam;
         di = cast(lparam, POINTER(DRAWITEMSTRUCT)).contents
         if not (di.itemState & ODS_SELECTED):
             comctl32.DefSubclassProc(hwnd, msg, wparam, lparam)
@@ -737,7 +607,6 @@ def DarkDialogInit(hwnd):
                 # wrap to prevent garbage collection while dialog exists
                 window_checkbox = Window('Button', parent_window=dlg, wrap_hwnd=hwnd_control)
 
-#                rc_text = Dialog.calculate_text_rect(window_title, hfont=hfont)
                 rc_text = rc
 
                 hwnd_static = user32.CreateWindowExW(
@@ -755,26 +624,9 @@ def DarkDialogInit(hwnd):
                     NULL
                 )
                 user32.SendMessageW(hwnd_static, WM_SETFONT, hfont, MAKELPARAM(1, 0))
-
                 comctl32.SetWindowSubclass(hwnd_control, DarkCheckBoxSubclassProc, CHECKBOX_SUBCLASS_ID, 0)
 
             elif style & BS_TYPEMASK == BS_GROUPBOX:
-#                rc = RECT()
-#                user32.GetWindowRect(hwnd_control, byref(rc))
-#                user32.MapWindowPoints(None, hwnd, byref(rc), 2)
-#                buf = create_unicode_buffer(64)
-#                user32.GetWindowTextW(hwnd_control, buf, 64)
-#
-#                static = Static(
-#                    parent_window=dlg,
-#                    style=WS_CHILD | SS_SIMPLE | WS_VISIBLE,
-#                    ex_style=WS_EX_TRANSPARENT,
-#                    left=rc.left + 10, top=rc.top, width=rc.right - rc.left - 16, height=rc.bottom - rc.top,
-#                    window_title=buf.value
-#                )
-#                static.set_font(hfont=hfont)
-#                static.apply_theme(True)
-
                 comctl32.SetWindowSubclass(hwnd_control, DarkGroupBoxSubClassProc, 1, 0)
 
         ########################################
@@ -806,18 +658,6 @@ def DarkDialogInit(hwnd):
             hwnd_combobox = user32.SendMessageW(hwnd_control, CBEM_GETCOMBOCONTROL, 0, 0)
             uxtheme.SetWindowTheme(hwnd_combobox, "DarkMode_CFD", None)
 
-#            SetWindowSubclass(hwnd_combobox, &DarkComboBoxExClassProc, COMBOBOXEX_SUBCLASS_ID, 0);
-
-#        elif window_class == 'ComboLBox':
-#            uxtheme.SetWindowTheme(hwnd_control, 'DarkMode_CFD', None)
-#
-#            user32.SetWindowLongPtrA(hwnd_control, GWL_EXSTYLE,
-#                    user32.GetWindowLongPtrA(hwnd_control, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE)
-#            user32.SetWindowLongPtrA(hwnd_control, GWL_STYLE,
-#                    user32.GetWindowLongPtrA(hwnd_control, GWL_STYLE) | WS_BORDER)
-#            user32.SetWindowPos(hwnd_control, 0, 0, 0, 0, 0,
-#                    SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED)
-
         ########################################
         # Edit
         ########################################
@@ -833,8 +673,6 @@ def DarkDialogInit(hwnd):
 
                 rc = RECT()
                 user32.GetWindowRect(hwnd_control, byref(rc))
-                #w, h = rc.right - rc.left, rc.bottom - rc.top
-                #user32.SendMessageW(hwnd_control, EM_SETMARGINS, EC_LEFTMARGIN, 2)
                 user32.MapWindowPoints(None, user32.GetParent(hwnd_control), byref(rc), 2)
                 user32.SetWindowPos(
                     hwnd_control, 0,
@@ -883,8 +721,6 @@ def DarkDialogInit(hwnd):
         elif window_class == 'msctls_updown32':
             uxtheme.SetWindowTheme(hwnd_control, 'DarkMode_Explorer', None)
 
-#        elif window_class == 'msctls_statusbar32':
-#            Statusbar(wrap_hwnd=hwnd_control).apply_theme(True)
 
 ########################################
 #
@@ -904,4 +740,5 @@ def DarkDialogHandleMessages(msg, wparam):
         gdi32.SetBkColor(wparam, DARK_CONTROL_BG_COLOR)
         gdi32.SetDCBrushColor(wparam, DARK_CONTROL_BG_COLOR)
         return gdi32.GetStockObject(DC_BRUSH)
+
     return FALSE

@@ -11,7 +11,7 @@ from resources import *
 IS_FROZEN = getattr(sys, 'frozen', False)
 
 APP_NAME = 'PillowView'
-APP_VERSION = 1
+APP_VERSION ='1.0'
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 BIN_DIR = APP_DIR if IS_FROZEN else os.path.join(APP_DIR, 'bin')
 
@@ -28,7 +28,6 @@ HCURSOR_CROSS = user32.LoadCursorW(NULL, IDC_CROSS)
 HCURSOR_ZOOM = user32.LoadCursorW(HMOD_RESOURCES, MAKEINTRESOURCEW(IDI_CURSOR_ZOOM))
 
 HBRUSH_NULL = gdi32.GetStockObject(NULL_BRUSH)
-#HPEN_NULL = gdi32.GetStockObject(NULL_PEN)
 
 ANIMATION_TIMER_ID = 1000
 

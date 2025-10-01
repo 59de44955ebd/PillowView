@@ -1,6 +1,6 @@
 # https://learn.microsoft.com/en-us/windows/win32/controls/static-controls
 
-from ..const import * #WS_CHILD, WS_VISIBLE
+from ..const import *
 from ..window import *
 from ..dlls import user32
 from ..themes import *
@@ -45,7 +45,6 @@ class Static(Window):
     #
     ########################################
     def destroy_window(self):
-#        if self.is_dark:
         if self.parent_window:
             self.parent_window.unregister_message_callback(WM_CTLCOLORSTATIC, self._on_WM_CTLCOLORSTATIC)
         super().destroy_window()
@@ -54,19 +53,11 @@ class Static(Window):
     #
     ########################################
     def _on_WM_CTLCOLORSTATIC(self, hwnd, wparam, lparam):
-#        if self.is_dark:
-
         gdi32.SetTextColor(wparam, DARK_TEXT_COLOR)
         gdi32.SetBkColor(wparam, self.dark_bg_color if self.is_dark else self.bg_color)
         gdi32.SetDCBrushColor(wparam, self.dark_bg_color if self.is_dark else self.bg_color)
 
         return gdi32.GetStockObject(DC_BRUSH)
-#            return gdi32.GetStockObject(HOLLOW_BRUSH)
-
-
-#            gdi32.SetTextColor(wparam, DARK_TEXT_COLOR)
-#            gdi32.SetBkColor(wparam, DARK_BG_COLOR)
-#            return DARK_BG_BRUSH
 
     ########################################
     #
@@ -84,10 +75,5 @@ class Static(Window):
     #
     ########################################
     def apply_theme(self, is_dark):
-#        self.is_dark = is_dark
         super().apply_theme(is_dark)
-#        if is_dark:
-#            self.parent_window.register_message_callback(WM_CTLCOLORSTATIC, self._on_WM_CTLCOLORSTATIC)
-#        else:
-#            self.parent_window.unregister_message_callback(WM_CTLCOLORSTATIC, self._on_WM_CTLCOLORSTATIC)
         self.force_redraw_window()  # triggers WM_CTLCOLORSTATIC

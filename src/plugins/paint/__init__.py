@@ -17,13 +17,11 @@ from winapp.settings import Settings
 from PIL import Image
 from .myedit import *
 
-#from mystatic import MyStatic
-
 from image import *
-
 from const import APP_NAME, HBRUSH_NULL, EVENT_IMAGE_CHANGED
 
-HMOD_RESOURCES = kernel32.LoadLibraryW(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources.dll'))
+HMOD_RESOURCES = kernel32.LoadLibraryW(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources.dll'))
 
 IDI_CURSOR_FLOODFILL = 5000
 IDI_CURSOR_PENCIL = 5001
@@ -80,17 +78,6 @@ TOOLBAR_WIDTH = 2 * TOOLBAR_BUTTON_SIZE + 14 + 2 * TOOLPAR_INDENT
 
 SEPARATOR_BRUSH = gdi32.CreateSolidBrush(0xA0A0A0)
 
-#class BLENDFUNCTION(Structure):
-#    _fields_ = [
-#        ("BlendOp", BYTE),
-#        ("BlendFlags", BYTE),
-#        ("SourceConstantAlpha", BYTE),
-#        ("AlphaFormat", BYTE),
-#    ]
-#
-#msimg32 = windll.Msimg32
-#msimg32.AlphaBlend.argtypes = (HDC, INT, INT, INT, INT, HDC, INT, INT, INT, INT, BLENDFUNCTION)
-
 
 class Plugin():
 
@@ -103,7 +90,10 @@ class Plugin():
         self.is_initialized = False
 
         self.state = {
-            'font_paint': {'font_name': 'Consolas', 'font_size': 14, 'font_weight': 400, 'font_italic': FALSE, 'font_underline': FALSE},
+            'font_paint': {
+                'font_name': 'Consolas', 'font_size': 14, 'font_weight': 400,
+                'font_italic': FALSE, 'font_underline': FALSE
+            },
             'pen_color': 0x000000,
             'brush_color': 0xFFFFFF,
             'line_width': 5,
@@ -185,9 +175,11 @@ class Plugin():
                 self.set_current_tool(IDM_PAINT_SELECT)
                 if self.main.img.mode in ('P', 'L', 'LA'):
                     idx = get_closest_palette_color(self.state['pen_color'], main.img)
-                    self.state['pen_color'] = RGB_TO_CR(*main.img.getpalette()[3 * idx:3 * idx + 3]) if main.img.mode == 'P' else RGB_TO_CR(idx, idx, idx)
+                    self.state['pen_color'] = (RGB_TO_CR(*main.img.getpalette()[3 * idx:3 * idx + 3])
+                            if main.img.mode == 'P' else RGB_TO_CR(idx, idx, idx))
                     idx = get_closest_palette_color(self.state['brush_color'], main.img)
-                    self.state['brush_color'] = RGB_TO_CR(*main.img.getpalette()[3 * idx:3 * idx + 3]) if main.img.mode == 'P' else RGB_TO_CR(idx, idx, idx)
+                    self.state['brush_color'] = (RGB_TO_CR(*main.img.getpalette()[3 * idx:3 * idx + 3])
+                            if main.img.mode == 'P' else RGB_TO_CR(idx, idx, idx))
                     self.update_pen()
                     self.update_brush()
                     self.static_colors.redraw_window()
@@ -283,10 +275,6 @@ class Plugin():
             if lparam == 0:
                 command_id = LOWORD(wparam)
 
-#                if command_id in self.COMMAND_MESSAGE_MAP:
-#                    self.COMMAND_MESSAGE_MAP[command_id]()
-#                    return
-
                 # Toolbar menus
                 if command_id == IDM_TEXT_FONT:
                     font = self.main.show_font_dialog(**self.state['font_paint'])
@@ -300,12 +288,14 @@ class Plugin():
 
                 elif command_id == IDM_SHAPE_DRAW:
                     self.shape_draw = not self.shape_draw
-                    user32.CheckMenuItem(self.hmenu_shape, IDM_SHAPE_DRAW, MF_BYCOMMAND | (MF_CHECKED if self.shape_draw else MF_UNCHECKED))
+                    user32.CheckMenuItem(self.hmenu_shape, IDM_SHAPE_DRAW,
+                            MF_BYCOMMAND | (MF_CHECKED if self.shape_draw else MF_UNCHECKED))
                     self.update_pen()
 
                 elif command_id == IDM_SHAPE_FILL:
                     self.shape_fill = not self.shape_fill
-                    user32.CheckMenuItem(self.hmenu_shape, IDM_SHAPE_FILL, MF_BYCOMMAND | (MF_CHECKED if self.shape_fill else MF_UNCHECKED))
+                    user32.CheckMenuItem(self.hmenu_shape, IDM_SHAPE_FILL,
+                            MF_BYCOMMAND | (MF_CHECKED if self.shape_fill else MF_UNCHECKED))
                     self.update_brush()
 
                 elif command_id in (IDM_PICKER_PEN, IDM_PICKER_BRUSH):
@@ -315,17 +305,17 @@ class Plugin():
 
                 elif command_id == IDM_ARROW_START:
                     self.arrow_start = not self.arrow_start
-                    user32.CheckMenuItem(self.hmenu_arrow, IDM_ARROW_START, MF_BYCOMMAND | (MF_CHECKED if self.arrow_start else MF_UNCHECKED))
+                    user32.CheckMenuItem(self.hmenu_arrow, IDM_ARROW_START,
+                            MF_BYCOMMAND | (MF_CHECKED if self.arrow_start else MF_UNCHECKED))
 
                 elif command_id == IDM_ARROW_END:
                     self.arrow_end = not self.arrow_end
-                    user32.CheckMenuItem(self.hmenu_arrow, IDM_ARROW_END, MF_BYCOMMAND | (MF_CHECKED if self.arrow_end else MF_UNCHECKED))
+                    user32.CheckMenuItem(self.hmenu_arrow, IDM_ARROW_END,
+                            MF_BYCOMMAND | (MF_CHECKED if self.arrow_end else MF_UNCHECKED))
 
             # Toolbar buttons
             elif lparam == self.toolbar_paint.hwnd:
                 command_id = LOWORD(wparam)
-
-#                if command_id < IDM_PAINT_PEN_COLOR:
 
                 if self.current_tool == IDM_PAINT_SELECT:
                     self.main.selection.show(SW_HIDE)
@@ -436,12 +426,13 @@ class Plugin():
 
         self.static_colors = Static(
             self.toolbar_paint,
-            style=WS_CHILD | WS_VISIBLE | SS_BITMAP | SS_NOTIFY,
+            style = WS_CHILD | WS_VISIBLE | SS_BITMAP | SS_NOTIFY,
             left = x, top = y - 12,
             width = 47, height = 57,
         )
 
-        self.hbitmap_colors = user32.LoadBitmapW(HMOD_RESOURCES, MAKEINTRESOURCEW(IDB_SWITCH_COLORS))
+        self.hbitmap_colors = user32.LoadBitmapW(HMOD_RESOURCES,
+                MAKEINTRESOURCEW(IDB_SWITCH_COLORS))
 
         ########################################
         #
@@ -450,14 +441,16 @@ class Plugin():
             ps = PAINTSTRUCT()
             hdc = user32.BeginPaint(hwnd, byref(ps))
 
-            user32.FrameRect(hdc, byref(RECT(0, 10, 35, 34)), gdi32.GetStockObject(WHITE_BRUSH if self.main.is_dark else BLACK_BRUSH))
+            user32.FrameRect(hdc, byref(RECT(0, 10, 35, 34)),
+                    gdi32.GetStockObject(WHITE_BRUSH if self.main.is_dark else BLACK_BRUSH))
 
             hbr = gdi32.CreateSolidBrush(self.state['brush_color'])
             user32.FillRect(hdc, byref(RECT(1, 11, 12, 33)), hbr)
             user32.FillRect(hdc, byref(RECT(12, 11, 34, 23)), hbr)
             gdi32.DeleteObject(hbr)
 
-            user32.FrameRect(hdc, byref(RECT(12, 23, 47, 47)), gdi32.GetStockObject(WHITE_BRUSH if self.main.is_dark else BLACK_BRUSH))
+            user32.FrameRect(hdc, byref(RECT(12, 23, 47, 47)),
+                    gdi32.GetStockObject(WHITE_BRUSH if self.main.is_dark else BLACK_BRUSH))
             hbr = gdi32.CreateSolidBrush(self.state['pen_color'])
             user32.FillRect(hdc, byref(RECT(13, 24, 46, 46)), hbr)
             gdi32.DeleteObject(hbr)
@@ -503,11 +496,11 @@ class Plugin():
         ########################################
         self.static_width = Static(
             self.toolbar_paint,
-            style=WS_CHILD | SS_LEFT,
-            bg_color=BG_COLOR_TEXT,
+            style = WS_CHILD | SS_LEFT,
+            bg_color = BG_COLOR_TEXT,
             left = x, top = y + 6,
             width = TOOLBAR_WIDTH - x - 2, height = 16,
-            window_title='Width (px)',
+            window_title = 'Width (px)',
         )
         self.static_width.set_font()
 
@@ -522,7 +515,7 @@ class Plugin():
 
         self.updown_width = UpDown(
             self.toolbar_paint,
-            style=WS_CHILD | UDS_AUTOBUDDY | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_ARROWKEYS | UDS_HOTTRACK,
+            style = WS_CHILD | UDS_AUTOBUDDY | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_ARROWKEYS | UDS_HOTTRACK,
         )
 
         self.updown_width.set_range(1, 999)
@@ -625,7 +618,7 @@ class Plugin():
 
         visible = not self.toolbar_paint.visible
         if visible:
-            self.toolbar_paint.set_window_pos(x=0, y=y, width=TOOLBAR_WIDTH, height=height, flags=SWP_NOZORDER | SWP_NOACTIVATE)
+            self.toolbar_paint.set_window_pos(0, y, TOOLBAR_WIDTH, height, flags = SWP_NOZORDER | SWP_NOACTIVATE)
             self.toolbar_paint.show()
 
             if not self.is_initialized:
@@ -662,14 +655,18 @@ class Plugin():
                         y += self.main.toolbar_main.height
                     if self.toolbar_paint.visible:
                         width -= TOOLBAR_WIDTH
-                        x +=TOOLBAR_WIDTH
+                        x += TOOLBAR_WIDTH
 
-                    self.toolbar_paint.set_window_pos(x=0, y=y, width=TOOLBAR_WIDTH, height=height, flags=SWP_NOZORDER | SWP_NOACTIVATE)
+                    self.toolbar_paint.set_window_pos(
+                        0, y,
+                        TOOLBAR_WIDTH, height,
+                        flags = SWP_NOZORDER | SWP_NOACTIVATE
+                    )
 
                     self.main.canvas.set_window_pos(
                         x, y,
                         width, height,
-                        flags=SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED
+                        flags = SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED
                     )
 
                     user32.CheckMenuItem(self.main.hmenu, IDM_TOOLBAR, MF_BYCOMMAND |
@@ -678,25 +675,42 @@ class Plugin():
                 self.main.COMMAND_MESSAGE_MAP[IDM_TOOLBAR] = _toogle_toolbar_main
 
             if user32.IsZoomed(self.main.hwnd):
-                self.canvas.set_window_pos(x=TOOLBAR_WIDTH, y=y, width=rc.right - TOOLBAR_WIDTH, height=height, flags=SWP_NOZORDER | SWP_NOACTIVATE)
+                self.canvas.set_window_pos(
+                    TOOLBAR_WIDTH, y,
+                    rc.right - TOOLBAR_WIDTH, height,
+                    flags = SWP_NOZORDER | SWP_NOACTIVATE
+                )
             else:
-                self.canvas.set_window_pos(x=TOOLBAR_WIDTH, y=y, flags=SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE)
+                self.canvas.set_window_pos(
+                    x = TOOLBAR_WIDTH, y = y,
+                    flags = SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE
+                )
                 rc_main = self.main.get_window_rect()
-                self.main.set_window_pos(width=rc_main.right - rc_main.left + TOOLBAR_WIDTH, height=rc_main.bottom - rc_main.top, flags=SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE)
+                self.main.set_window_pos(
+                    width = rc_main.right - rc_main.left + TOOLBAR_WIDTH, height = rc_main.bottom - rc_main.top,
+                    flags = SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE
+                )
 
         else:
             self.toolbar_paint.show(SW_HIDE)
             if user32.IsZoomed(self.main.hwnd):
-                self.canvas.set_window_pos(x=0, y=y, width=rc.right, height=height, flags=SWP_NOZORDER | SWP_NOACTIVATE)
+                self.canvas.set_window_pos(0, y, rc.right, height, flags = SWP_NOZORDER | SWP_NOACTIVATE)
             else:
-                self.canvas.set_window_pos(x=0, y=y, flags=SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE)
+                self.canvas.set_window_pos(0, y, flags = SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE)
                 rc_main = self.main.get_window_rect()
-                self.main.set_window_pos(width=rc_main.right - rc_main.left - TOOLBAR_WIDTH, height=rc_main.bottom - rc_main.top, flags=SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE)
+                self.main.set_window_pos(
+                    width = rc_main.right - rc_main.left - TOOLBAR_WIDTH, height = rc_main.bottom - rc_main.top,
+                    flags = SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE
+                )
 
             self.edit_paint.show(SW_HIDE)
             self.set_current_tool(IDM_PAINT_SELECT)
 
-        user32.CheckMenuItem(user32.GetSubMenu(self.main.hmenu, 4), self.command_id_show, MF_BYCOMMAND | (MF_CHECKED if self.toolbar_paint.visible else MF_UNCHECKED))
+        user32.CheckMenuItem(
+            user32.GetSubMenu(self.main.hmenu, 4),
+            self.command_id_show,
+            MF_BYCOMMAND | (MF_CHECKED if self.toolbar_paint.visible else MF_UNCHECKED)
+        )
 
     ########################################
     #
@@ -714,10 +728,16 @@ class Plugin():
             height -= self.main.toolbar_main.height
         if self.main.statusbar.visible:
             height -= self.main.statusbar.height
-        self.toolbar_paint.set_window_pos(width=TOOLBAR_WIDTH, height=height, flags=SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE)
+        self.toolbar_paint.set_window_pos(
+            width = TOOLBAR_WIDTH, height = height,
+            flags = SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE
+        )
         if self.toolbar_paint.visible:
             width -= TOOLBAR_WIDTH
-        self.canvas.set_window_pos(width=width, height=height, flags=SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE)
+        self.canvas.set_window_pos(
+            width = width, height = height,
+            flags = SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE
+        )
 
     ########################################
     #
@@ -731,13 +751,10 @@ class Plugin():
     ########################################
     def update_pen(self):
         gdi32.DeleteObject(self.hpen)
-
         buf = create_unicode_buffer(4)
         self.edit_width.send_message(WM_GETTEXT, 4, buf)
         self.state['line_width'] = int(buf.value)
-
-        self.hpen = gdi32.CreatePen(PS_SOLID, self.state['line_width'], self.state['pen_color']) #if self.shape_draw else HPEN_NULL
-
+        self.hpen = gdi32.CreatePen(PS_SOLID, self.state['line_width'], self.state['pen_color'])
         if self.edit_paint.visible:
             self.edit_paint.redraw_window()
 
@@ -746,7 +763,7 @@ class Plugin():
     ########################################
     def update_brush(self):
         gdi32.DeleteObject(self.hbrush)
-        self.hbrush = gdi32.CreateSolidBrush(self.state['brush_color']) #if self.shape_fill else HBRUSH_NULL
+        self.hbrush = gdi32.CreateSolidBrush(self.state['brush_color'])
 
     ########################################
     #
@@ -768,13 +785,14 @@ class Plugin():
     ########################################
     def set_text_align(self, command_id):
         for i in (IDM_TEXT_ALIGN_LEFT, IDM_TEXT_ALIGN_CENTER, IDM_TEXT_ALIGN_RIGHT):
-            user32.CheckMenuItem(self.hmenu_text, i, MF_BYCOMMAND | (MF_CHECKED if i == command_id else MF_UNCHECKED))
+            user32.CheckMenuItem(self.hmenu_text, i,
+                    MF_BYCOMMAND | (MF_CHECKED if i == command_id else MF_UNCHECKED))
         style = user32.GetWindowLongA(self.edit_paint.hwnd, GWL_STYLE) & ~3  # remove alignment
         if command_id == IDM_TEXT_ALIGN_LEFT:
             style |= ES_LEFT
         elif command_id == IDM_TEXT_ALIGN_CENTER:
             style |= ES_CENTER
-        else:  #if command_id == IDM_TEXT_ALIGN_RIGHT:
+        else:
             style |= ES_RIGHT
         user32.SetWindowLongA(self.edit_paint.hwnd, GWL_STYLE, style)
         self.edit_paint.redraw_window()
@@ -784,7 +802,6 @@ class Plugin():
     ########################################
     def show_color_dialog(self, initial_color=0):
         if self.main.img.mode in ('P', 'L', 'LA'):
-            #return dialog_color_select.show(self.main, initial_color)
             return self.show_palette_color_dialog(self.main, initial_color)
         else:
             return self.main.show_color_dialog(initial_color)
@@ -829,8 +846,6 @@ class Plugin():
                     x = 5 + ctx['idx_selected_old'] % 16 * 20
                     y = 5 + ctx['idx_selected_old'] // 16 * 20
                     rc = RECT(x - 2, y - 2, x + 18, y + 18)
-#                if idx == ctx['idx_selected_old']:
-#                    rc = RECT(x - 2, y - 2, x + 18, y + 18)
                     user32.FrameRect(hdc, byref(rc), DARK_BG_BRUSH if main.is_dark else COLOR_3DFACE + 1)
                     user32.InflateRect(byref(rc), 1, 1)
                     user32.FrameRect(hdc, byref(rc), DARK_BG_BRUSH if main.is_dark else COLOR_3DFACE + 1)
@@ -853,15 +868,17 @@ class Plugin():
                     gdi32.DeleteObject(hbr)
 
                     if idx == ctx['trans']:
-                        user32.FrameRect(hdc, byref(rc), gdi32.GetStockObject(WHITE_BRUSH if main.is_dark else BLACK_BRUSH))
+                        user32.FrameRect(hdc, byref(rc), gdi32.GetStockObject(
+                                WHITE_BRUSH if main.is_dark else BLACK_BRUSH))
                         user32.InflateRect(byref(rc), -1, -1)
-                        user32.FrameRect(hdc, byref(rc), gdi32.GetStockObject(BLACK_BRUSH if main.is_dark else WHITE_BRUSH))
+                        user32.FrameRect(hdc, byref(rc), gdi32.GetStockObject(
+                                BLACK_BRUSH if main.is_dark else WHITE_BRUSH))
                         user32.InflateRect(byref(rc), -1, -1)
-                        user32.FrameRect(hdc, byref(rc), gdi32.GetStockObject(WHITE_BRUSH if main.is_dark else BLACK_BRUSH))
+                        user32.FrameRect(hdc, byref(rc), gdi32.GetStockObject(
+                                WHITE_BRUSH if main.is_dark else BLACK_BRUSH))
                         user32.InflateRect(byref(rc), -1, -1)
-                        user32.FrameRect(hdc, byref(rc), gdi32.GetStockObject(BLACK_BRUSH if main.is_dark else WHITE_BRUSH))
-#                        user32.InflateRect(byref(rc), -4, -4)
-#                        user32.FillRect(hdc, byref(rc), DARK_BG_BRUSH if main.is_dark else COLOR_3DFACE + 1)
+                        user32.FrameRect(hdc, byref(rc), gdi32.GetStockObject(
+                                BLACK_BRUSH if main.is_dark else WHITE_BRUSH))
 
                     if idx % 16 == 15:
                         x = 5
@@ -981,9 +998,8 @@ class Plugin():
 
         cx = (rc_dest.right - rc_dest.left - (rc_edit.right - rc_edit.left)) // 2
         cy = (rc_dest.bottom - rc_dest.top - (rc_edit.bottom - rc_edit.top)) // 2
-#        cx, cy = 3, 3
 
-        gdi32.SetStretchBltMode(hdc_bitmap2, HALFTONE)  # ???
+        gdi32.SetStretchBltMode(hdc_bitmap2, HALFTONE)
         gdi32.StretchBlt(
             # Dest
             hdc_bitmap2,
@@ -1011,11 +1027,11 @@ class Plugin():
         self.edit_paint.show(SW_HIDE)
         self.edit_paint.set_window_text('')
 
-        user32.SetWindowLongA(self.edit_paint.hwnd, GWL_STYLE, style & ~WS_VISIBLE)  # ???
+        user32.SetWindowLongA(self.edit_paint.hwnd, GWL_STYLE, style & ~WS_VISIBLE)
 
     ########################################
-    # Almost WYSIWYG: while mouse is down we draw/paint into a lores copy of the bitmap,
-    # on mouse up we draw/paint into the actual (possibly hires) bitmap
+    # Almost WYSIWYG: while mouse is down we draw/paint into a lores copy,
+    # On mouse up we draw/paint into the actual (possibly hires) bitmap
     ########################################
     def _draw_shape(self, x, y, shape_type):
 
@@ -1206,7 +1222,10 @@ class Plugin():
             self.canvas.static.h_bitmap = hbitmap_org
             self.canvas.static.img_width = img_width_org
             self.canvas.static.img_height = img_height_org
-            self.canvas.static.set_window_pos(rc_static.left, rc_static.top, rc_static.right - rc_static.left, rc_static.bottom - rc_static.top)
+            self.canvas.static.set_window_pos(
+                rc_static.left, rc_static.top,
+                rc_static.right - rc_static.left, rc_static.bottom - rc_static.top
+            )
 
             # Now draw rect into original bitmap
             pt_click.x, pt_click.y = round(pt_click.x / self.canvas.zoom), round(pt_click.y / self.canvas.zoom)
@@ -1223,18 +1242,37 @@ class Plugin():
             is_ctrl = user32.GetAsyncKeyState(VK_CONTROL) > 1
             if shape_type == IDM_PAINT_RECT:
                 if is_ctrl:
-                    gdi32.Rectangle(hdc_bitmap2, 2 * pt_click.x - pt_dest_abs.x, 2 * pt_click.y - pt_dest_abs.y, pt_dest_abs.x, pt_dest_abs.y)
+                    gdi32.Rectangle(
+                        hdc_bitmap2,
+                        2 * pt_click.x - pt_dest_abs.x, 2 * pt_click.y - pt_dest_abs.y,
+                        pt_dest_abs.x, pt_dest_abs.y
+                    )
                 else:
-                    gdi32.Rectangle(hdc_bitmap2, pt_click.x, pt_click.y, pt_dest_abs.x, pt_dest_abs.y)
+                    gdi32.Rectangle(
+                        hdc_bitmap2,
+                        pt_click.x, pt_click.y,
+                        pt_dest_abs.x, pt_dest_abs.y
+                    )
 
             elif shape_type == IDM_PAINT_ELLIPSE:
                 if is_ctrl:
-                    gdi32.Ellipse(hdc_bitmap2, 2 * pt_click.x - pt_dest_abs.x, 2 * pt_click.y - pt_dest_abs.y, pt_dest_abs.x, pt_dest_abs.y)
+                    gdi32.Ellipse(
+                        hdc_bitmap2,
+                        2 * pt_click.x - pt_dest_abs.x, 2 * pt_click.y - pt_dest_abs.y,
+                        pt_dest_abs.x, pt_dest_abs.y
+                    )
                 else:
-                    gdi32.Ellipse(hdc_bitmap2, pt_click.x, pt_click.y, pt_dest_abs.x, pt_dest_abs.y)
+                    gdi32.Ellipse(
+                        hdc_bitmap2,
+                        pt_click.x, pt_click.y,
+                        pt_dest_abs.x, pt_dest_abs.y
+                    )
 
             elif shape_type == IDM_PAINT_LINE:
-                x, y = (2 * pt_click.x - pt_dest_abs.x, 2 * pt_click.y - pt_dest_abs.y) if is_ctrl else (pt_click.x, pt_click.y)
+                x, y = (
+                    2 * pt_click.x - pt_dest_abs.x,
+                    2 * pt_click.y - pt_dest_abs.y
+                ) if is_ctrl else (pt_click.x, pt_click.y)
                 if self.arrow_start or self.arrow_end:
                     slopy = atan2( ( pt_click.y - pt_dest_abs.y ), ( pt_click.x - pt_dest_abs.x ))
                     cosy = cos(slopy)
@@ -1244,12 +1282,26 @@ class Plugin():
 
                     if self.arrow_start:
                         self._draw_arrow_head(hdc_bitmap2, x, y, -cosy, -siny, arrow_base, arrow_height)
-                        gdi32.MoveToEx(hdc_bitmap2, x - round(arrow_height * cosy), y - round(arrow_height * siny), None)
+                        gdi32.MoveToEx(
+                            hdc_bitmap2,
+                            x - round(arrow_height * cosy),
+                            y - round(arrow_height * siny),
+                            None
+                        )
                     else:
                         gdi32.MoveToEx(hdc_bitmap2, x, y, None)
                     if self.arrow_end:
-                        gdi32.LineTo(hdc_bitmap2, pt_dest_abs.x + round(arrow_height * cosy), pt_dest_abs.y + round(arrow_height * siny))
-                        self._draw_arrow_head(hdc_bitmap2, pt_dest_abs.x, pt_dest_abs.y, cosy, siny, arrow_base, arrow_height)
+                        gdi32.LineTo(
+                            hdc_bitmap2,
+                            pt_dest_abs.x + round(arrow_height * cosy),
+                            pt_dest_abs.y + round(arrow_height * siny)
+                        )
+                        self._draw_arrow_head(
+                            hdc_bitmap2,
+                            pt_dest_abs.x, pt_dest_abs.y,
+                            cosy, siny,
+                            arrow_base, arrow_height
+                        )
                     else:
                         gdi32.LineTo(hdc_bitmap2, pt_dest_abs.x, pt_dest_abs.y)
                 else:
@@ -1267,8 +1319,6 @@ class Plugin():
             # Restore mode
             ########################################
 
-#            print('OLD - NEW', self.main.img.mode, img.mode)
-
             if self.main.img.mode in ('P', 'PA'):
                 pal_img = self.main.img.convert('P') if self.main.img.mode == 'PA' else self.main.img
                 img = img.quantize(palette=pal_img, dither=Image.Dither.NONE)
@@ -1279,15 +1329,12 @@ class Plugin():
             elif self.main.img.mode in ('1', 'CMYK'):
                 img = img.convert(self.main.img.mode)
 
-#MODE_TO_BPP = {'1': 1, 'P': 8, 'L': 8, 'PA': 16, 'LA': 16, 'RGB': 24, 'RGBA': 32, 'CMYK': 32}
-
             ########################################
             # Restore alpha channel
             ########################################
 
             if self.main.img.mode in ('RGBA', 'LA', 'PA'):
                 alpha = self.main.img.getchannel('A')
-#                img = img.convert('RGB')
                 img.putalpha(alpha)
 
             img.info = self.main.img.info
@@ -1315,9 +1362,6 @@ class Plugin():
         vert[1] = POINT(x, y)  #m_Two;
         vert[2].x = x + round( arrow_height * cosy + arrow_base * siny )
         vert[2].y = y - round( arrow_base * cosy - arrow_height * siny )
-#        if(as->openArrowHead)
-#            Polyline(hDC,vert,3);
-#        else
         gdi32.Polygon(hdc, vert, 3)
         gdi32.DeleteObject(hbr)
         gdi32.RestoreDC(hdc, state)
@@ -1359,8 +1403,6 @@ class Plugin():
 
             gdi32.RestoreDC(hdc_bitmap, state)
 
-#                    user32.InvalidateRect(self.canvas.static.hwnd, None, FALSE)
-
             rc = RECT(pt_last.x, pt_last.y, x, y)
             _normalize(rc)
             user32.InflateRect(byref(rc), line_width, line_width)
@@ -1397,7 +1439,6 @@ class Plugin():
     ########################################
     def _draw_floodfill(self, x, y):
         x, y = int(x / self.canvas.zoom), int(y / self.canvas.zoom)
-#        if self.state['tolerance']:
 
         img = self.main.img.copy()
 
@@ -1410,29 +1451,24 @@ class Plugin():
                 return color & 0xFF
 
         if img.mode in ('P', 'PA', 'L', 'LA'):
-            ImageDraw.floodfill(img, (x, y), _color_to_index(self.state['brush_color']), thresh=self.state['tolerance'])
+            ImageDraw.floodfill(
+                img, (x, y), _color_to_index(self.state['brush_color']),
+                thresh=self.state['tolerance']
+            )
         else:
-            ImageDraw.floodfill(img, (x, y), CR_TO_RGB(self.state['brush_color']), thresh=self.state['tolerance'])
+            ImageDraw.floodfill(
+                img, (x, y), CR_TO_RGB(self.state['brush_color']),
+                thresh=self.state['tolerance']
+            )
 
         self.main.img = img
         self.main.undo_stack.push(self.main.img)
         self.canvas.update_hbitmap(image_to_hbitmap(self.main.img))
 
-#        else:
-#            hdc_static = user32.GetDC(self.canvas.static.hwnd)
-#            hdc_bitmap = gdi32.CreateCompatibleDC(hdc_static)
-#            gdi32.SelectObject(hdc_bitmap, self.canvas.static.h_bitmap)
-#            gdi32.SelectObject(hdc_bitmap, self.hbrush)
-#            gdi32.ExtFloodFill(hdc_bitmap, x, y, gdi32.GetPixel(hdc_static, x, y), FLOODFILLSURFACE)
-#            gdi32.DeleteDC(hdc_bitmap)
-#            user32.ReleaseDC(self.canvas.static.hwnd, hdc_static)
-#        user32.InvalidateRect(self.canvas.static.hwnd, None, FALSE)
-
     ########################################
     #
     ########################################
     def _pick_color(self, x, y):
-#                x, y = int(x / self.canvas.zoom), int(y / self.canvas.zoom)
         hdc_static = user32.GetDC(self.canvas.static.hwnd)
         if self.picker_mode == IDM_PICKER_BRUSH:
             self.state['brush_color'] = gdi32.GetPixel(hdc_static, x, y)

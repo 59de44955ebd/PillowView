@@ -9,6 +9,10 @@ set APP_NAME=PillowView
 rmdir /s /q "dist\%APP_NAME%" 2>nul
 ::del "dist\%APP_NAME%-standalone-windows-x64.zip" 2>nul
 
+cd src
+python _compile_const.py
+cd ..
+
 set PYTHONPATH=
 
 ren src\winapp\const.py __const.py

@@ -1,23 +1,12 @@
-#import timeit
-#t0 = timeit.default_timer()
-
 import os
 import importlib
 import io
 import math
 import time
 
-#T 0.0088
-
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageOps, BmpImagePlugin
 BmpImagePlugin.USE_RAW_ALPHA = True
-
 import PilImagePlugin
-
-#from PIL import GifImagePlugin
-#GifImagePlugin.LOADING_STRATEGY = GifImagePlugin.LoadingStrategy.RGB_AFTER_DIFFERENT_PALETTE_ONLY
-
-# T 0.314
 
 from winapp.dlls import *
 from winapp.mainwin import *
@@ -25,21 +14,12 @@ from winapp.controls.toolbar import *
 from winapp.controls.statusbar import *
 from winapp.settings import Settings
 
-#print('T', timeit.default_timer() - t0)
-# T 0.4744
-
 from canvas import Canvas, EVENT_CANVAS_ZOOM_CHANGED
 import image
 from image import *
 from selection import Selection
 from undo import UndoStack, EVENT_CAN_UNDO_CHANGED, EVENT_CAN_REDO_CHANGED
-
-#print('T', timeit.default_timer() - t0)
-#T 0.508
-
 from const import *
-
-#print('T', timeit.default_timer() - t0)
 
 
 class App(MainWin):
@@ -56,7 +36,6 @@ class App(MainWin):
             'bgcolor_new' : 0xFFFFFF,
             'use_dark': False,
             'show_toolbar': True,
-
             'resize_window': True,
             'ask_save': False,
         }
@@ -68,7 +47,6 @@ class App(MainWin):
         self.is_playing = False
         self.pt_print_paper_size = POINT(21000, 29700)  # in mm/100
         self.rc_print_margins = RECT(1000, 1500, 1000, 1500)  # in mm/100
-#        self.dpi = (96, 96)
 
         image.BG_COLOR = CR_TO_RGB(self.state['bg_color'])
 
@@ -86,8 +64,8 @@ class App(MainWin):
             hicon = user32.LoadIconW(HMOD_RESOURCES, MAKEINTRESOURCEW(1)),
             hmenu = user32.LoadMenuW(HMOD_RESOURCES, MAKEINTRESOURCEW(1)),
             haccel = user32.LoadAcceleratorsW(HMOD_RESOURCES, MAKEINTRESOURCEW(1)),
-            hbrush=HBRUSH_NULL,
-            dark_bg_brush=HBRUSH_NULL,
+            hbrush = HBRUSH_NULL,
+            dark_bg_brush = HBRUSH_NULL,
         )
 
         self.COMMAND_MESSAGE_MAP = {
@@ -208,10 +186,10 @@ class App(MainWin):
 
         self.toolbar_main = ToolBar(
             self,
-            style=WS_CHILD | WS_CLIPSIBLINGS | WS_BORDER | TBSTYLE_TOOLTIPS | TBSTYLE_FLAT | (WS_VISIBLE if self.state['show_toolbar'] else 0),
-            ex_style=WS_EX_COMPOSITED,
-            icon_size=16,
-            toolbar_buttons=toolbar_buttons,
+            style = WS_CHILD | WS_CLIPSIBLINGS | WS_BORDER | TBSTYLE_TOOLTIPS | TBSTYLE_FLAT | (WS_VISIBLE if self.state['show_toolbar'] else 0),
+            ex_style = WS_EX_COMPOSITED,
+            icon_size = 16,
+            toolbar_buttons = toolbar_buttons,
 
             height = 28,
 
@@ -229,14 +207,15 @@ class App(MainWin):
             h_bitmap_dark = user32.LoadBitmapW(HMOD_RESOURCES, MAKEINTRESOURCEW(IDB_TOOLBAR_MAIN_DARK)),
             h_imagelist_disabled_dark = NULL,
 
-            window_title='Main',
-            num_images=13,
-            hide_text=True
+            window_title = 'Main',
+            num_images = 13,
+            hide_text = True
         )
 
         user32.SendMessageW(self.toolbar_main.hwnd, TB_SETINDENT, 3, 0)
 
-        self.canvas = Canvas(self, top=self.toolbar_main.height if self.state['show_toolbar'] else 0, bgcolor=self.state['bg_color'])
+        self.canvas = Canvas(self, top = self.toolbar_main.height if self.state['show_toolbar'] else 0,
+                bgcolor=self.state['bg_color'])
         self.canvas.connect(EVENT_CANVAS_ZOOM_CHANGED, lambda zoom:
                 self.statusbar.set_text(f'{round(100 * zoom)} %', STATUSBAR_PART_ZOOM))
 
@@ -329,7 +308,6 @@ class App(MainWin):
         self.statusbar = StatusBar(self)
 
         self.idm_last = 1000
-#        self.plugins = {}
         plugin_dir = os.path.join(APP_DIR, 'plugins')
         if os.path.isdir(plugin_dir):
             for p in os.listdir(plugin_dir):
@@ -337,7 +315,6 @@ class App(MainWin):
                     plugin = importlib.import_module(f'plugins.{p}')
                     if hasattr(plugin, 'Plugin'):
                         try:
-#                            self.plugins[p] =
                             plugin.Plugin(self)
                         except Exception as e:
                             self.show_message_box(str(e), f'Plugin {p}', MB_ICONERROR | MB_OK)
@@ -475,8 +452,6 @@ class App(MainWin):
             user32.CheckMenuItem(self.hmenu, IDM_DARK, MF_BYCOMMAND | MF_CHECKED)
             self.apply_theme(True)
             uxtheme.SetWindowTheme(self.canvas.hwnd, 'DarkMode_Explorer', None)
-
-#        print('T', timeit.default_timer() - t0)
 
         if len(args) > 0:
             self.load_file(args[0])
@@ -627,9 +602,6 @@ class App(MainWin):
             with open(filename, 'r') as f:
                 img = text_to_image(f.read())
 
-#        elif ext in self.file_open_handlers:
-#            img = self.file_open_handlers[ext](filename)
-
         elif ext == '.raw':
             from dialogs import dialog_raw_open
             img = dialog_raw_open.show(self, filename)
@@ -683,9 +655,12 @@ class App(MainWin):
         if self.img.format == 'ICNS':
             self.img.load()
 
-        x, y, width, height, zoom = self.get_win_rect_for_image()
-        self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=False, zoom=zoom)
-        self.set_window_pos(x=x, y=y, width=width, height=height, flags=SWP_NOZORDER | SWP_NOACTIVATE)
+        if self.state['resize_window']:
+            x, y, width, height, zoom = self.get_win_rect_for_image()
+            self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=False, zoom=zoom)
+            self.set_window_pos(x=x, y=y, width=width, height=height, flags=SWP_NOZORDER | SWP_NOACTIVATE)
+        else:
+            self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=True)
 
         self.selection.show(SW_HIDE)
         self.update_window_title()
@@ -735,16 +710,16 @@ class App(MainWin):
         self.has_frames = False
         self.can_play = False
 
-#        self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=True)
-
-        x, y, width, height, zoom = self.get_win_rect_for_image()
-        self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=False, zoom=zoom)  #, no_scroll=zoom == 1)
-        self.set_window_pos(x=x, y=y, width=width, height=height, flags=SWP_NOZORDER | SWP_NOACTIVATE)
+        if self.state['resize_window']:
+            x, y, width, height, zoom = self.get_win_rect_for_image()
+            self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=False, zoom=zoom)
+            self.set_window_pos(x=x, y=y, width=width, height=height, flags=SWP_NOZORDER | SWP_NOACTIVATE)
+        else:
+            self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=True)
 
         self.update_window_title()
         self.update_menus()
         self.update_status_infos()
-#        self.update_status_zoom()
         self.emit(EVENT_IMAGE_CHANGED)
 
     ########################################
@@ -798,8 +773,8 @@ class App(MainWin):
         if not filename:
             return
 
-        # Logic: we only update the filename, but keep the current image, i.e. the original format and mode/BBP
-        # "Reopen" in the menu loads the actual saved image.
+        # Logic: we only update the filename, but keep the current image, i.e. the original
+        # format and mode/BPP. "Reopen" in the menu loads the actual saved image.
         self.filename = filename
         self.undo_stack.clear(self.img)
         self.update_window_title()
@@ -843,8 +818,13 @@ class App(MainWin):
         if buf.value == 'Edit':
             return user32.SendMessageW(hwnd_focus, EM_UNDO, 0, 0)
         self.img = self.undo_stack.undo()
-        x, y, width, height, zoom = self.get_win_rect_for_image()
-        self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=False, zoom=zoom)  #, no_scroll=zoom == 1)
+
+        if self.state['resize_window']:
+            x, y, width, height, zoom = self.get_win_rect_for_image()
+            self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=False, zoom=zoom)
+        else:
+            self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=True)
+
         self.update_status_infos()
         self.update_menus()
 
@@ -858,8 +838,13 @@ class App(MainWin):
         if buf.value == 'Edit':
             return user32.SendMessageW(hwnd_focus, EM_UNDO, 0, 0)
         self.img = self.undo_stack.redo()
-        x, y, width, height, zoom = self.get_win_rect_for_image()
-        self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=False, zoom=zoom)  #, no_scroll=zoom == 1)
+
+        if self.state['resize_window']:
+            x, y, width, height, zoom = self.get_win_rect_for_image()
+            self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=False, zoom=zoom)
+        else:
+            self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=True)
+
         self.update_status_infos()
         self.update_menus()
 
@@ -878,7 +863,12 @@ class App(MainWin):
 
         if self.selection.visible:
             rc = self.selection.get_rect()
-            x, y, cx, cy = int(rc.left / self.canvas.zoom), int(rc.top / self.canvas.zoom), int((rc.right - rc.left) / self.canvas.zoom), int((rc.bottom - rc.top) / self.canvas.zoom)
+            x, y, cx, cy = (
+                int(rc.left / self.canvas.zoom),
+                int(rc.top / self.canvas.zoom),
+                int((rc.right - rc.left) / self.canvas.zoom),
+                int((rc.bottom - rc.top) / self.canvas.zoom)
+            )
         else:
             x, y, cx, cy = 0, 0, self.img.width, self.img.height
 
@@ -949,11 +939,12 @@ class App(MainWin):
         ))
         self.undo_stack.push(self.img)
 
-#        self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True)  #, zoom_to_fit=True)
-
-        x, y, width, height, zoom = self.get_win_rect_for_image()
-        self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=False, zoom=zoom)  #, no_scroll=zoom == 1)
-        self.set_window_pos(x=x, y=y, width=width, height=height, flags=SWP_NOZORDER | SWP_NOACTIVATE)
+        if self.state['resize_window']:
+            x, y, width, height, zoom = self.get_win_rect_for_image()
+            self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=False, zoom=zoom)
+            self.set_window_pos(x=x, y=y, width=width, height=height, flags=SWP_NOZORDER | SWP_NOACTIVATE)
+        else:
+            self.canvas.load_hbitmap(image_to_hbitmap(self.img), force_update=True, zoom_to_fit=True)
 
         self.update_status_infos()
         self.statusbar.set_text(f'{round(100 * self.canvas.zoom)} %', STATUSBAR_PART_ZOOM)
@@ -1034,7 +1025,10 @@ class App(MainWin):
             # Available methods are Dither.NONE or Dither.FLOYDSTEINBERG (default).
             dither = Image.Dither.FLOYDSTEINBERG if dither else Image.Dither.NONE
 
-            if img.mode in ('CMYK', '1', 'P') and control_id in (IDC_DEPTH_BTN_P_8, IDC_DEPTH_BTN_P_4, IDC_DEPTH_BTN_P_1, IDC_DEPTH_BTN_P_CUSTOM):
+            if img.mode in ('CMYK', '1', 'P') and control_id in (
+                    IDC_DEPTH_BTN_P_8, IDC_DEPTH_BTN_P_4,
+                    IDC_DEPTH_BTN_P_1, IDC_DEPTH_BTN_P_CUSTOM
+            ):
                 img = img.convert('RGB')
 
             if control_id == IDC_DEPTH_BTN_RGBA:
@@ -1092,8 +1086,7 @@ class App(MainWin):
                     _force_pal_size(img, colors)
 
             elif control_id == IDC_DEPTH_BTN_1:
-                img = img.convert('1', dither=dither) #, dither=Image.Dither.NONE)
-#               img = self.img.quantize(colors=2, dither=Image.Dither.NONE)
+                img = img.convert('1', dither=dither)
 
             self.img = img
             self.undo_stack.push(self.img)
@@ -1162,11 +1155,13 @@ class App(MainWin):
             self.img = ImageOps.invert(self.img.convert('RGB')).convert('CMYK')
 
         elif self.img.mode == 'P':
-            self.img = ImageOps.invert(self.img.convert('RGB')).convert('P', palette=Image.ADAPTIVE, dither=Image.Dither.NONE)
+            self.img = ImageOps.invert(self.img.convert('RGB')).convert('P',
+                    palette=Image.ADAPTIVE, dither=Image.Dither.NONE)
 
         elif self.img.mode == 'PA':
             alpha = self.img.getchannel("A")
-            self.img = ImageOps.invert(self.img.convert('RGB')).convert('P', palette=Image.ADAPTIVE, dither=Image.Dither.NONE)
+            self.img = ImageOps.invert(self.img.convert('RGB')).convert('P',
+                    palette=Image.ADAPTIVE, dither=Image.Dither.NONE)
             self.img.putalpha(alpha)
 
         elif self.img.mode == 'RGBA':
@@ -1203,11 +1198,13 @@ class App(MainWin):
 
         elif self.img.mode == 'PA':
             alpha = self.img.getchannel('A')
-            self.img = ImageOps.autocontrast(self.img.convert('RGB')).convert('P', palette=Image.ADAPTIVE, dither=Image.Dither.NONE)
+            self.img = ImageOps.autocontrast(self.img.convert('RGB')).convert('P',
+                    palette=Image.ADAPTIVE, dither=Image.Dither.NONE)
             self.img.putalpha(alpha)
 
         elif self.img.mode == 'P':
-            self.img = ImageOps.autocontrast(self.img.convert('RGB')).convert('P', palette=Image.ADAPTIVE, dither=Image.Dither.NONE)
+            self.img = ImageOps.autocontrast(self.img.convert('RGB')).convert('P',
+                    palette=Image.ADAPTIVE, dither=Image.Dither.NONE)
 
         elif self.img.mode == '1':
             return
@@ -1258,7 +1255,8 @@ class App(MainWin):
             -0.062,  1.378, -0.016, 0,
             -0.262, -0.122,  1.383, 0,
         ))
-        # An enhancement factor of 0.0 gives a solid gray image, a factor of 1.0 gives the original image, and greater values increase the contrast of the image.
+        # An enhancement factor of 0.0 gives a solid gray image, a factor of 1.0 gives
+        # the original image, and greater values increase the contrast of the image.
         enhancer = ImageEnhance.Contrast(img)
         img = enhancer.enhance(.65)
         tmp = create_vignette(img.size).convert('RGB')
@@ -1305,13 +1303,11 @@ class App(MainWin):
         radius = 6
         step_size = radius + 3
         # Intentional error on the positionning of dots to create a wave-like effect
-#        errors = (1, 0, 1, 1, 2, 3, 3, 1, 2, 1)
         errors = (-1, -2, -1, -1, 0, 1, 1, -1, 0, -1)
         img = self.img.copy()
         width, height = self.img.size
         draw = ImageDraw.Draw(img)
-        colors_tmp = self.img.resize((math.ceil(width / step_size), math.ceil(height / step_size))).getdata()  # , resample = Image.Resampling.BILINEAR
-#        draw.rectangle((0, 0, width, height), fill=(255,255,255))
+        colors_tmp = self.img.resize((math.ceil(width / step_size), math.ceil(height / step_size))).getdata()
         cnt = 0
         for y in range(radius, height, step_size):
             for x in range(radius, width, step_size):
@@ -1521,7 +1517,6 @@ class App(MainWin):
     ########################################
     def action_original_size(self):
         self.canvas.zoom_original_size()
-#        self.statusbar.set_text('100 %', STATUSBAR_PART_ZOOM)
 
     ########################################
     #
@@ -1552,8 +1547,6 @@ class App(MainWin):
         style = user32.GetWindowLongA(self.hwnd, GWL_STYLE)
         if self.is_fullscreen:
             self.statusbar.show(SW_HIDE)
-#            if self.toolbar_main.visible:
-#                self.action_toggle_toolbar()
             user32.SetMenu(self.hwnd, 0)
             style &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU)
         else:
@@ -1604,7 +1597,11 @@ class App(MainWin):
     ########################################
     def action_about(self):
         self.show_message_box(
-            f'{APP_NAME} v0.{APP_VERSION}\n\nImage viewer and simple image editor for Windows based on\nPython, Pillow and the Windows API. Inspired by IrfanView.',
+            (
+                f'{APP_NAME} v{APP_VERSION}\n\nImage viewer and simple image editor '
+                'for Windows based on\nPython, Pillow and the Windows API. '
+                'Inspired by IrfanView.'
+            ),
             'About'
         )
 
@@ -1659,7 +1656,7 @@ class App(MainWin):
             w = h * self.img.width // self.img.height
             x = ((rc.right - rc.left) - w) // 2
 
-        h_bitmap = self.canvas.static.h_bitmap  # image_to_hbitmap(self.img)
+        h_bitmap = self.canvas.static.h_bitmap
         hdc_mem = gdi32.CreateCompatibleDC(hdc)
         gdi32.SelectObject(hdc_mem, h_bitmap)
 

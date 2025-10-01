@@ -7,13 +7,6 @@ from ..wintypes_extended import MAKELPARAM
 from ..const import * #WM_USER
 from ..window import *
 from .common import NMHDR
-#user32 = windll.user32
-
-#typedef struct _NM_UPDOWN {
-#  NMHDR hdr;
-#  int   iPos;
-#  int   iDelta;
-#} NMUPDOWN, *LPNMUPDOWN;
 
 class NMUPDOWN(Structure):
     _fields_ = [
@@ -101,24 +94,13 @@ class UpDown(Window):
     # special
     ########################################
     def set_window_pos(self, x, y, w, h, hwnd_insert_after=0, flags=0):
-#        #user32.SetWindowPos(self.hwnd, hwnd_insert_after, x, y, w, h, flags)
         if self.hwnd_buddy and flags & SWP_NOSIZE:
-
             rc = RECT()
             user32.GetWindowRect(self.hwnd_buddy, byref(rc))
-
             user32.SetWindowPos(self.hwnd_buddy, hwnd_insert_after, x, y, 0, 0, flags)
             super().set_window_pos(x + rc.right - rc.left + 1, y, 0, 0, hwnd_insert_after, SWP_NOSIZE)
-#            #user32.SendMessageW(self.hwnd, UDM_SETBUDDY, self.hwnd_buddy, 0)
         else:
             super().set_window_pos(x, y, w, h, hwnd_insert_after, flags)
-
-#        self.current_control.set_window_pos(
-#            width // 2 - (rc.right - rc.left) // 2,
-#            height // 2 - (rc.bottom - rc.top) // 2,
-##                    PANEL_WIDTH + max(0, (width - PANEL_WIDTH - CONTROL_WIDTH) // 2),
-##                    max(0, (height - CONTROL_HEIGHT) // 2),
-#            0, 0, 0, SWP_NOSIZE)
 
     ########################################
     # special
@@ -140,33 +122,6 @@ class UpDown(Window):
         self.is_darkmode = is_dark
 
         uxtheme.SetWindowTheme(self.hwnd, 'DarkMode_Explorer' if is_dark else 'Explorer', None)
-        #uxtheme.SetWindowTheme(self.hwnd, '', '')
-
-#        hwnd_buddy = user32.SendMessageW(self.hwnd, UDM_GETBUDDY, 0, 0)
-#        if self.hwnd_buddy:
-#            #uxtheme.SetWindowTheme(hwnd_buddy, 'DarkMode_Explorer' if is_dark else 'Explorer', None)
-##            if is_dark:
-##                def _callback(hwnd, msg, wparam, lparam):
-##                    if msg == WM_CTLCOLOREDIT and lparam==hwnd_buddy:
-##                        gdi32.SetTextColor(wparam, DARK_TEXT_COLOR)
-##                        gdi32.SetBkColor(wparam, DARK_CONTROL_BG_COLOR)
-##                        gdi32.SetDCBrushColor(wparam, DARK_CONTROL_BG_COLOR)
-##                        return gdi32.GetStockObject(DC_BRUSH)
-##                self.hook(self.hwnd_parent, _callback)
-##            else:
-##                self.unhook(self.hwnd_parent)
-#
-#            if is_dark:
-##                def _callback(wparam, lparam):
-##                    if lparam == hwnd_buddy:
-##                        gdi32.SetTextColor(wparam, DARK_TEXT_COLOR)
-##                        gdi32.SetBkColor(wparam, DARK_CONTROL_BG_COLOR)
-##                        gdi32.SetDCBrushColor(wparam, DARK_CONTROL_BG_COLOR)
-##                        return gdi32.GetStockObject(DC_BRUSH)
-#
-#                self.parent_window.register_message_callback(WM_CTLCOLOREDIT, self.on_WM_CTLCOLOREDIT)
-#            else:
-#                self.parent_window.register_message_callback(WM_CTLCOLOREDIT, self.on_WM_CTLCOLOREDIT)
 
     ########################################
     #

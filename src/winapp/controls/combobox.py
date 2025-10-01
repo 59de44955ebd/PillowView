@@ -3,8 +3,7 @@
 from ctypes import Structure, sizeof, byref, create_unicode_buffer
 from ctypes.wintypes import DWORD, RECT, HWND
 
-from ..const import *  # (WS_CHILD, WS_VISIBLE, DC_BRUSH, WM_CTLCOLOREDIT, WM_CTLCOLORLISTBOX)
-# from ..wintypes_extended import MAKELONG
+from ..const import *
 from ..window import Window
 from ..dlls import gdi32, user32, uxtheme
 from ..themes import DARK_TEXT_COLOR, DARK_CONTROL_BG_COLOR
@@ -38,14 +37,6 @@ class ComboBox(Window):
         )
 
         self.__has_edit = style & CBS_DROPDOWN
-
-        # find internal listbox (ComboLBox)
-#        ci = COMBOBOXINFO()
-#        user32.SendMessageW(self.hwnd, CB_GETCOMBOBOXINFO, 0, byref(ci))
-#        self._listbox = ListBox(parent_window=self, wrap_hwnd=ci.hwndList)
-
-#        buf = create_unicode_buffer(100)
-#        user32.GetClassNameW(ci.hwndList, buf, 100)
 
     # #######################################
     #
