@@ -247,7 +247,7 @@ def show(main):
 
     img = main.img
 
-    if ctx['format'] in BBP1_ONLY:
+    if ctx['format'] in BPP1_ONLY:
         img = img.convert('1')
 
     elif ctx['format'] in P_ONLY:
@@ -278,7 +278,7 @@ def show(main):
             img = img.convert('RGBA')
 
     elif img.mode == '1':
-        if ctx['format'] in NO_BBP1:
+        if ctx['format'] in NO_BPP1:
             img = img.convert('RGB')
 
     if ctx['format'] == 'ICNS':

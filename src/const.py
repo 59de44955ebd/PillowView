@@ -40,6 +40,7 @@ FORMATS_SAVE = {
     'AVIF': ('.avif', '.avifs'),
     'BLP': ('*.blp',),
     'BMP': ('*.bmp',),
+#    'CUR': ('*.cur',),
     'DDS': ('*.dds',),
     'DIB': ('*.dib',),
     'EPS': ('*.eps', '*.ps'),
@@ -66,15 +67,15 @@ FORMATS_SAVE = {
 
 FORMATS_ANIMATION = ['AVIF', 'FLI', 'GIF', 'PNG', 'WEBP']
 
-BBP1_ONLY = ('MSP', 'XBM')
+BPP1_ONLY = ('MSP', 'XBM')
 P_ONLY = ('BLP',)
 NO_CMYK = ('BMP', 'DDS', 'DIB', 'GIF', 'ICNS', 'ICO', 'PCX', 'PNG', 'PPM', 'QOI', 'SGI', 'TGA')
 NO_RGBA = ('EPS', 'JPEG', 'PCX')
 NO_LA = ('BMP', 'DIB', 'EPS', 'JPEG', 'PCX', 'PPM', 'QOI', 'SGI')
 NO_L = ('QOI',)
 NO_P = ('DDS', 'EPS', 'JPEG', 'JPEG2000', 'PPM', 'QOI', 'SGI')
-NO_BBP1 = ('DDS', 'EPS', 'GIF', 'JPEG', 'JPEG2000', 'PNG', 'SGI', 'TGA', 'TIFF')
-OK_PA = ('IM', 'PIL', 'TIFF', 'WEBP')
+NO_BPP1 = ('DDS', 'EPS', 'GIF', 'JPEG', 'JPEG2000', 'PNG', 'SGI', 'TGA', 'TIFF')
+OK_PA = ('AVIF', 'IM', 'PIL', 'TIFF', 'WEBP')
 
 STATUSBAR_PARTS = (0,   130, 130, 60, 45, 70, 60)
 

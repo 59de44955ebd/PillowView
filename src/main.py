@@ -6,7 +6,9 @@ import time
 
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageOps, BmpImagePlugin
 BmpImagePlugin.USE_RAW_ALPHA = True
+
 import PilImagePlugin
+import CurImagePlugin
 
 from winapp.dlls import *
 from winapp.mainwin import *
@@ -631,6 +633,15 @@ class App(MainWin):
             self.statusbar.set_parts(STATUSBAR_PARTS, parts_right_aligned=True)
             rc = self.get_client_rect()
             self.statusbar.update_size(rc.right)
+
+        if ext == '.cur':
+#            img = img.info['XORbitmap']
+            img = img.convert('L')
+
+#            img = img.convert('RGB')
+#            img.putpixel(img.info['Hotspot'], (255, 0, 0))
+
+            img.putalpha(img.info['ANDbitmap'].convert('L'))
 
         self.img = img
         self.undo_stack.clear(self.img)

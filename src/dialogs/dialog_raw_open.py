@@ -30,7 +30,7 @@ def show(main, filename):
                 DarkDialogInit(hwnd)
             user32.SendMessageW(hwnd, WM_SETICON, 0, main.hicon)
 
-#            user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_RBN_BBP_24), BM_SETCHECK, BST_CHECKED, 0)
+#            user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_RBN_BPP_24), BM_SETCHECK, BST_CHECKED, 0)
             user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_CHK_INTERLEAVED), BM_SETCHECK, BST_CHECKED, 0)
 
             # Try to guess values
@@ -40,18 +40,18 @@ def show(main, filename):
             sq = math.isqrt(size)
             if size == sq ** 2:
                 if sq % 4 == 0:
-                    user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_RBN_BBP_32), BM_SETCHECK, BST_CHECKED, 0)
+                    user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_RBN_BPP_32), BM_SETCHECK, BST_CHECKED, 0)
                     user32.SetWindowTextW(user32.GetDlgItem(hwnd, IDC_RAW_EDIT_WIDTH), str(sq // 2))
                     user32.SetWindowTextW(user32.GetDlgItem(hwnd, IDC_RAW_EDIT_HEIGHT), str(sq // 2))
                 else:
-                    user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_RBN_BBP_8), BM_SETCHECK, BST_CHECKED, 0)
+                    user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_RBN_BPP_8), BM_SETCHECK, BST_CHECKED, 0)
                     user32.SetWindowTextW(user32.GetDlgItem(hwnd, IDC_RAW_EDIT_WIDTH), str(sq))
                     user32.SetWindowTextW(user32.GetDlgItem(hwnd, IDC_RAW_EDIT_HEIGHT), str(sq))
 
             elif size % 3 == 0: # RGB?
                 size //= 3
                 sq = math.isqrt(size)
-                user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_RBN_BBP_24), BM_SETCHECK, BST_CHECKED, 0)
+                user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_RBN_BPP_24), BM_SETCHECK, BST_CHECKED, 0)
                 if size == sq ** 2:
                     user32.SetWindowTextW(user32.GetDlgItem(hwnd, IDC_RAW_EDIT_WIDTH), str(sq))
                     user32.SetWindowTextW(user32.GetDlgItem(hwnd, IDC_RAW_EDIT_HEIGHT), str(sq))
@@ -62,13 +62,13 @@ def show(main, filename):
             elif size % 4 == 0: # RGBA?
                 size //= 4
                 sq = math.isqrt(size)
-                user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_RBN_BBP_32), BM_SETCHECK, BST_CHECKED, 0)
+                user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_RBN_BPP_32), BM_SETCHECK, BST_CHECKED, 0)
                 if size == sq ** 2:
                     user32.SetWindowTextW(user32.GetDlgItem(hwnd, IDC_RAW_EDIT_WIDTH), str(sq))
                     user32.SetWindowTextW(user32.GetDlgItem(hwnd, IDC_RAW_EDIT_HEIGHT), str(sq))
 
             else:
-                user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_RBN_BBP_8), BM_SETCHECK, BST_CHECKED, 0)
+                user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_RBN_BPP_8), BM_SETCHECK, BST_CHECKED, 0)
 
         elif msg == WM_CLOSE:
             user32.EndDialog(hwnd, 0)
@@ -93,10 +93,10 @@ def show(main, filename):
                     user32.GetWindowTextW(user32.GetDlgItem(hwnd, IDC_RAW_EDIT_HEADER), buf, 8)
                     header_size = int(buf.value or 0)
 
-                    bbp = 24
+                    bpp = 24
                     for n in (1, 8, 16, 24, 32, 48, 64, 96, 128):
-                        if user32.SendMessageW(user32.GetDlgItem(hwnd, eval(f'IDC_RAW_RBN_BBP_{n}')), BM_GETCHECK, 0, 0):
-                            bbp = n
+                        if user32.SendMessageW(user32.GetDlgItem(hwnd, eval(f'IDC_RAW_RBN_BPP_{n}')), BM_GETCHECK, 0, 0):
+                            bpp = n
                             break
 
                     with open(filename, 'rb') as f:
@@ -110,14 +110,14 @@ def show(main, filename):
                     is_big_endian = user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_CHK_BE), BM_GETCHECK, 0, 0)
                     vertical_flip = user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_CHK_VERTICAL_FLIP), BM_GETCHECK, 0, 0)
 
-                    if ctx['size'] < w * h * (bbp // 8) + header_size:
+                    if ctx['size'] < w * h * (bpp // 8) + header_size:
                         main.show_message_box('Not enough image data for selected settings.', 'Wrong Settings', MB_ICONERROR | MB_OK)
                         return 0
 
                     class BEFloat(ctypes.BigEndianStructure):
                         _fields_ = [('v', ctypes.c_float)]
 
-                    if bbp == 128:
+                    if bpp == 128:
                         try:
                             if is_big_endian:
 
@@ -175,7 +175,7 @@ def show(main, filename):
                         gamma = 1 / 2.2
                         ctx['img'] = gamma_correction(ctx['img'], gamma)
 
-                    elif bbp == 96:
+                    elif bpp == 96:
                         try:
                             if is_big_endian:
                                 if interleaved:
@@ -222,7 +222,7 @@ def show(main, filename):
 
                         ctx['img'] = gamma_correction(ctx['img'], 1 / 2.2)
 
-                    elif bbp == 64:
+                    elif bpp == 64:
                         data = cast(bits, POINTER(c_uint16))
                         if interleaved:
                             data_8bit = (c_ubyte * (w * h * 4))()
@@ -247,7 +247,7 @@ def show(main, filename):
                                 channels[:3] = list(reversed(channels[:3]))
                             ctx['img'] = Image.merge('RGBA' if use_alpha else 'RGB', channels)
 
-                    elif bbp == 48:
+                    elif bpp == 48:
                         data = cast(bits, POINTER(c_uint16))
                         if interleaved:
                             data_8bit = (c_ubyte * (w * h * 3))()
@@ -267,7 +267,7 @@ def show(main, filename):
                                 channels.reverse()
                             ctx['img'] = Image.merge('RGB', channels)
 
-                    elif bbp == 32:
+                    elif bpp == 32:
                         is_cmyk = user32.SendMessageW(user32.GetDlgItem(hwnd, IDC_RAW_CHK_CMYK), BM_GETCHECK, 0, 0)
                         if interleaved:
                             if is_cmyk:
@@ -300,7 +300,7 @@ def show(main, filename):
                                     channels.reverse()
                                 ctx['img'] = Image.merge('RGB', channels)
 
-                    elif bbp == 24:
+                    elif bpp == 24:
                         if interleaved:
                             ctx['img'] = Image.frombytes('RGB', (w, h), bits, 'raw', 'BGR' if is_bgr else 'RGB')
                         else:
@@ -314,7 +314,7 @@ def show(main, filename):
                                 channels.reverse()
                             ctx['img'] = Image.merge('RGB', channels)
 
-                    elif bbp == 16:
+                    elif bpp == 16:
                         #if use_alpha:
                         if interleaved:
                             ctx['img'] = Image.frombytes('LA', (w, h), bits, 'raw', 'LA')  #.convert('RGBA')
@@ -327,10 +327,10 @@ def show(main, filename):
                                 pos += channel_size
                             ctx['img'] = Image.merge('LA', channels) #.convert('RGBA')
 
-                    elif bbp == 8:
+                    elif bpp == 8:
                         ctx['img'] = Image.frombytes('L', (w, h), bits, 'raw', 'L')
 
-                    elif bbp == 1:
+                    elif bpp == 1:
                         ctx['img'] = Image.frombytes('1', (w, h), bits, 'raw', '1')
 
                     if vertical_flip:

@@ -53,11 +53,11 @@ class Static(Window):
     #
     ########################################
     def _on_WM_CTLCOLORSTATIC(self, hwnd, wparam, lparam):
-        gdi32.SetTextColor(wparam, DARK_TEXT_COLOR)
-        gdi32.SetBkColor(wparam, self.dark_bg_color if self.is_dark else self.bg_color)
-        gdi32.SetDCBrushColor(wparam, self.dark_bg_color if self.is_dark else self.bg_color)
-
-        return gdi32.GetStockObject(DC_BRUSH)
+        if self.is_dark:
+            gdi32.SetTextColor(wparam, DARK_TEXT_COLOR if self.is_dark else 0x000000)
+            gdi32.SetBkColor(wparam, self.dark_bg_color if self.is_dark else self.bg_color)
+            gdi32.SetDCBrushColor(wparam, self.dark_bg_color if self.is_dark else self.bg_color)
+            return gdi32.GetStockObject(DC_BRUSH)
 
     ########################################
     #
